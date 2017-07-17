@@ -51,6 +51,7 @@ exec app_process /system/bin com.wise.main.HelloWorld
 ```
 
 ##LocalSocketServer
+
 ##WiseScreenShot
 * adb push PhoneClient.dex /sdcard
 * 运行CommandInstall.java

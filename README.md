@@ -16,7 +16,9 @@
 * 对于@hide标记的field和method，可通过反射进行调用。
 
 ##Adb
+
 ##app_process
+
 ###am命令
 
 ```
@@ -53,6 +55,7 @@ exec app_process /system/bin com.wise.main.HelloWorld
 ##LocalSocketServer
 
 ##WiseScreenShot
+
 * adb push PhoneClient.dex /sdcard
 * 运行CommandInstall.java
 * 运行ComputerClientFrame.java
