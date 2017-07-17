@@ -7,14 +7,11 @@ import javax.swing.JTextArea;
  */
 
 public class UserAction implements UserActionInterface {
-    private static final String TAG = "UserAction";
-    private ScriptInterface mSaveScript;
     private ScriptInterface mDisplayScript;
     private JTextArea mJTextArea;
 
     public UserAction(JTextArea jTextArea) {
         this.mJTextArea = jTextArea;
-        mSaveScript = new SaveScript();
         mDisplayScript = new DisplayScript(this.mJTextArea);
     }
 
@@ -29,19 +26,17 @@ public class UserAction implements UserActionInterface {
         System.out.println("actionViewClick x is " + x + " y is " + y);
 
         mDisplayScript.handleScript(stringBuilder);
-        mSaveScript.handleScript(stringBuilder);
     }
 
     @Override
     public void actionViewMove(int oldX, int oldY, int newX, int newY) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("DRAG|{'start':(" + oldX + "," + oldY + "),'end:('" + newX + "," + newY + "),'duration':1.0,'steps':10,}");
+        stringBuilder.append("DRAG|{'start':(" + oldX + "," + oldY + "),'end':(" + newX + "," + newY + "),'duration':1.0,'steps':10,}");
         stringBuilder.append("\n");
 
         System.out.println("actionViewMove");
 
         mDisplayScript.handleScript(stringBuilder);
-        mSaveScript.handleScript(stringBuilder);
     }
 
     @Override
@@ -55,16 +50,27 @@ public class UserAction implements UserActionInterface {
         System.out.println("actionBackPress");
 
         mDisplayScript.handleScript(stringBuilder);
-        mSaveScript.handleScript(stringBuilder);
     }
 
     @Override
     public void actionMenuPress() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("PRESS|{'name':'MENU','type':'downAndUp',}");
+        stringBuilder.append("\n");
 
+        System.out.println("actionMenuPress");
+
+        mDisplayScript.handleScript(stringBuilder);
     }
 
     @Override
     public void actionHomePress() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("PRESS|{'name':'HOME','type':'downAndUp',}");
+        stringBuilder.append("\n");
 
+        System.out.println("actionHomePress");
+
+        mDisplayScript.handleScript(stringBuilder);
     }
 }

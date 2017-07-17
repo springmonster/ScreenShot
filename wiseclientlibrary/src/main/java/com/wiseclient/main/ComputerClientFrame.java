@@ -1,17 +1,21 @@
 package com.wiseclient.main;
 
+import com.wiseclient.script.SaveScript;
 import com.wiseclient.script.UserAction;
 import com.wiseclient.script.UserActionInterface;
 
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -20,9 +24,11 @@ import java.net.Socket;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 /**
@@ -36,6 +42,8 @@ public class ComputerClientFrame extends JFrame {
     private int mDisplayX;
     private int mDisplayY;
     private UserActionInterface mUserActionInterface;
+    private JButton jButtonSaveFile;
+    private JTextArea jTextAreaShowScript;
     private int mMoveOldX;
     private int mMoveOldY;
     private int mMoveNewX;
@@ -51,21 +59,28 @@ public class ComputerClientFrame extends JFrame {
         mainPanel.setLayout(null);
 
         JButton connectBtn = new JButton("连接手机");
-        connectBtn.setBounds(0, 10, 500, 20);
+        connectBtn.setBounds(10, 10, 490, 20);
         mainPanel.add(connectBtn);
 
         mImageLabel = new JLabel();
-        mImageLabel.setBounds(0, 30, 500, 910);
+        mImageLabel.setBounds(10, 40, 490, 900);
         mImageLabel.setBackground(Color.BLUE);
         mainPanel.add(mImageLabel);
 
         mainPanel.add(createBottomBar());
 
-        JTextArea jTextAreaShowScript = new JTextArea();
-        jTextAreaShowScript.setBounds(500, 10, 500, 950);
+        initSaveButton(mainPanel);
+
+        jTextAreaShowScript = new JTextArea();
+        jTextAreaShowScript.setBounds(510, 40, 480, 930);
         jTextAreaShowScript.setLineWrap(true);
         jTextAreaShowScript.setWrapStyleWord(true);
-        mainPanel.add(jTextAreaShowScript);
+
+        JScrollPane scroll = new JScrollPane(jTextAreaShowScript);
+        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scroll.setBounds(510, 40, 480, 930);
+
+        mainPanel.add(scroll);
 
         this.add(mainPanel);
 
@@ -150,6 +165,26 @@ public class ComputerClientFrame extends JFrame {
         });
     }
 
+    private void initSaveButton(JPanel mainPanel) {
+        jButtonSaveFile = new JButton();
+        jButtonSaveFile.setText("保存脚本");
+        jButtonSaveFile.setBounds(510, 10, 480, 20);
+        jButtonSaveFile.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                int result = fileChooser.showSaveDialog(null);
+                if (JFileChooser.APPROVE_OPTION == result) {
+                    File file = fileChooser.getSelectedFile();
+                    System.out.println(file.getAbsolutePath());
+                    String scriptContent = jTextAreaShowScript.getText();
+                    SaveScript.saveFile(file, scriptContent);
+                }
+            }
+        });
+        mainPanel.add(jButtonSaveFile);
+    }
+
     private int calcXInDisplay(int input) {
         float result = mDisplayX * (input * 1.0f / mImageLabel.getWidth());
         return (int) result;
@@ -162,7 +197,7 @@ public class ComputerClientFrame extends JFrame {
 
     private JPanel createBottomBar() {
         JPanel bar = new JPanel(new GridLayout(1, 3));
-        bar.setBounds(0, 950, 500, 20);
+        bar.setBounds(10, 950, 490, 20);
 
         JButton menu = new JButton("MENU");
         JButton home = new JButton("HOME");
@@ -180,6 +215,7 @@ public class ComputerClientFrame extends JFrame {
                     writer.write("MENU");
                     writer.newLine();
                     writer.flush();
+                    mUserActionInterface.actionMenuPress();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -193,6 +229,7 @@ public class ComputerClientFrame extends JFrame {
                     writer.write("HOME");
                     writer.newLine();
                     writer.flush();
+                    mUserActionInterface.actionHomePress();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
