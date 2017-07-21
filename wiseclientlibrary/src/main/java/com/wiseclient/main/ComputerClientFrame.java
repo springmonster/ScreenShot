@@ -37,13 +37,22 @@ import javax.swing.JTextArea;
 
 public class ComputerClientFrame extends JFrame {
     private JLabel mImageLabel;
+    private JPanel mMainPanel;
+    private JButton jButtonSaveFile;
+    private JTextArea jTextAreaShowScript;
+    private JButton mConnectBtn;
+    private JScrollPane mJScrollPane;
+    private JPanel mJpanelBottomBar;
+
     private boolean isMove = false;
     private BufferedWriter writer;
     private int mDisplayX;
     private int mDisplayY;
+    private int mDisplayOldX;
+    private int mDisplayOldY;
+
     private UserActionInterface mUserActionInterface;
-    private JButton jButtonSaveFile;
-    private JTextArea jTextAreaShowScript;
+
     private int mMoveOldX;
     private int mMoveOldY;
     private int mMoveNewX;
@@ -54,39 +63,39 @@ public class ComputerClientFrame extends JFrame {
         this.setBounds(360, 20, 1000, 1000);
         this.setTitle("屏幕共享");
 
-        JPanel mainPanel = new JPanel();
-        mainPanel.setBounds(0, 0, 1000, 1000);
-        mainPanel.setLayout(null);
+        mMainPanel = new JPanel();
+        mMainPanel.setBounds(0, 0, 1000, 1000);
+        mMainPanel.setLayout(null);
 
-        JButton connectBtn = new JButton("连接手机");
-        connectBtn.setBounds(10, 10, 490, 20);
-        mainPanel.add(connectBtn);
+        mConnectBtn = new JButton("连接手机");
+        mConnectBtn.setBounds(10, 10, 490, 20);
+        mMainPanel.add(mConnectBtn);
 
         mImageLabel = new JLabel();
         mImageLabel.setBounds(10, 40, 490, 900);
         mImageLabel.setBackground(Color.BLUE);
-        mainPanel.add(mImageLabel);
+        mMainPanel.add(mImageLabel);
 
-        mainPanel.add(createBottomBar());
+        mMainPanel.add(createBottomBar());
 
-        initSaveButton(mainPanel);
+        initSaveButton(mMainPanel);
 
         jTextAreaShowScript = new JTextArea();
         jTextAreaShowScript.setBounds(510, 40, 480, 930);
         jTextAreaShowScript.setLineWrap(true);
         jTextAreaShowScript.setWrapStyleWord(true);
 
-        JScrollPane scroll = new JScrollPane(jTextAreaShowScript);
-        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        scroll.setBounds(510, 40, 480, 930);
+        mJScrollPane = new JScrollPane(jTextAreaShowScript);
+        mJScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        mJScrollPane.setBounds(510, 40, 480, 930);
 
-        mainPanel.add(scroll);
+        mMainPanel.add(mJScrollPane);
 
-        this.add(mainPanel);
+        this.add(mMainPanel);
 
         mUserActionInterface = new UserAction(jTextAreaShowScript);
 
-        connectBtn.addMouseListener(new MouseAdapter() {
+        mConnectBtn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 try {
@@ -196,16 +205,16 @@ public class ComputerClientFrame extends JFrame {
     }
 
     private JPanel createBottomBar() {
-        JPanel bar = new JPanel(new GridLayout(1, 3));
-        bar.setBounds(10, 950, 490, 20);
+        mJpanelBottomBar = new JPanel(new GridLayout(1, 3));
+        mJpanelBottomBar.setBounds(10, 950, 490, 20);
 
         JButton menu = new JButton("MENU");
         JButton home = new JButton("HOME");
         JButton back = new JButton("BACK");
 
-        bar.add(menu);
-        bar.add(home);
-        bar.add(back);
+        mJpanelBottomBar.add(menu);
+        mJpanelBottomBar.add(home);
+        mJpanelBottomBar.add(back);
 
         menu.addMouseListener(new MouseAdapter() {
             @Override
@@ -249,7 +258,7 @@ public class ComputerClientFrame extends JFrame {
                 }
             }
         });
-        return bar;
+        return mJpanelBottomBar;
     }
 
     private void read(final String ip, final String port) throws IOException {
@@ -266,6 +275,17 @@ public class ComputerClientFrame extends JFrame {
                     while (true) {
                         mDisplayX = dataInputStream.readInt();
                         mDisplayY = dataInputStream.readInt();
+                        if (mDisplayOldX != mDisplayX && mDisplayOldY != mDisplayY) {
+                            if (mDisplayOldX < mDisplayOldY && mDisplayX > mDisplayY) {
+                                //此时由竖屏状态改变为横屏状态
+                                changeDisplayOrientation(false);
+                            } else if (mDisplayOldX > mDisplayOldY && mDisplayX < mDisplayY) {
+                                //此时由横屏状态改变为竖屏状态
+                                changeDisplayOrientation(true);
+                            }
+                            mDisplayOldX = mDisplayX;
+                            mDisplayOldY = mDisplayY;
+                        }
 
                         int length = dataInputStream.readInt();
 
@@ -288,6 +308,26 @@ public class ComputerClientFrame extends JFrame {
                 }
             }
         }.start();
+    }
+
+    private void changeDisplayOrientation(boolean isVertical) {
+        if (isVertical) {
+            System.out.println("screen change to vertical");
+            mConnectBtn.setBounds(10, 10, 490, 20);
+            mImageLabel.setBounds(10, 40, 490, 900);
+            mJpanelBottomBar.setBounds(10, 950, 490, 20);
+            jButtonSaveFile.setBounds(510, 10, 480, 20);
+            mJScrollPane.setBounds(510, 40, 480, 930);
+        } else {
+            System.out.println("screen change to landscape");
+            mConnectBtn.setBounds(10, 10, 980, 20);
+            mImageLabel.setBounds(10, 40, 980, 450);
+            mJpanelBottomBar.setBounds(10, 500, 980, 20);
+            jButtonSaveFile.setBounds(10, 530, 980, 20);
+            mJScrollPane.setBounds(10, 560, 980, 400);
+        }
+        mMainPanel.validate();
+        mMainPanel.repaint();
     }
 
     public static void main(String[] args) throws IOException {

@@ -1,6 +1,7 @@
 package com.wise.wisescreenshot;
 
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.graphics.Point;
 import android.hardware.display.IDisplayManager;
 import android.hardware.input.InputManager;
@@ -15,11 +16,13 @@ import android.view.IWindowManager;
 import android.view.InputEvent;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.Surface;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -41,27 +44,48 @@ public class PhoneClient {
     private static Method injectInputEventMethod;
     private static long downTime;
     private static float scale = 0.5f;
+    private static int rotation = 0;
+    private static LocalServerSocket mLocalServerSocket;
 
     public static void main(String[] args) {
         System.out.println("Phone client start");
         try {
-            LocalServerSocket localServerSocket = new LocalServerSocket("wise-screen-shot");
-
-            init();
-
-            while (true) {
-                System.out.println("listening...");
-                try {
-                    LocalSocket localSocket = localServerSocket.accept();
-                    handleLocalSocket(localSocket);
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                    localServerSocket = new LocalServerSocket("wise-screen-shot");
-                }
-            }
+            startLocalServerSocket();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Phone client start error1");
             System.out.println(e.getMessage());
+            try {
+                mLocalServerSocket.close();
+                startLocalServerSocket();
+            } catch (IOException e1) {
+                System.out.println("Phone client start error2");
+                e1.printStackTrace();
+                System.out.println(e1.getMessage());
+            } catch (NoSuchMethodException e1) {
+                e1.printStackTrace();
+            } catch (IllegalAccessException e1) {
+                e1.printStackTrace();
+            } catch (InvocationTargetException e1) {
+                e1.printStackTrace();
+            } catch (ClassNotFoundException e1) {
+                e1.printStackTrace();
+            }
+        }
+    }
+
+    private static void startLocalServerSocket() throws IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        mLocalServerSocket = new LocalServerSocket("wise-screen-shot");
+        init();
+
+        while (true) {
+            System.out.println("listening...");
+            try {
+                LocalSocket localSocket = mLocalServerSocket.accept();
+                handleLocalSocket(localSocket);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                mLocalServerSocket = new LocalServerSocket("wise-screen-shot");
+            }
         }
     }
 
@@ -263,7 +287,18 @@ public class PhoneClient {
                 surfaceClassName = "android.view.SurfaceControl";
             }
             Bitmap bitmap = (Bitmap) Class.forName(surfaceClassName).getDeclaredMethod("screenshot", new Class[]{Integer.TYPE, Integer.TYPE}).invoke(null, Integer.valueOf(size.x), Integer.valueOf(size.y));
-            return bitmap;
+            if (rotation == 0) {
+                return bitmap;
+            }
+            Matrix m = new Matrix();
+            if (Surface.ROTATION_90 == rotation) {
+                m.postRotate(-90.0f);
+            } else if (Surface.ROTATION_180 == rotation) {
+                m.postRotate(-180.0f);
+            } else if (Surface.ROTATION_270 == rotation) {
+                m.postRotate(-270.0f);
+            }
+            return Bitmap.createBitmap(bitmap, 0, 0, size.x, size.y, m, false);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
@@ -281,13 +316,21 @@ public class PhoneClient {
             if (Build.VERSION.SDK_INT >= 18) {
                 wm = IWindowManager.Stub.asInterface((IBinder) getServiceMethod.invoke(null, "window"));
                 wm.getInitialDisplaySize(0, point);
+                rotation = wm.getRotation();
             } else if (Build.VERSION.SDK_INT == 17) {
                 DisplayInfo di = IDisplayManager.Stub.asInterface((IBinder) getServiceMethod.invoke(null, "display")).getDisplayInfo(0);
                 point.x = ((Integer) DisplayInfo.class.getDeclaredField("logicalWidth").get(di)).intValue();
                 point.y = ((Integer) DisplayInfo.class.getDeclaredField("logicalHeight").get(di)).intValue();
+                rotation = ((Integer) DisplayInfo.class.getDeclaredField("rotation").get(di)).intValue();
             } else {
                 wm = IWindowManager.Stub.asInterface((IBinder) getServiceMethod.invoke(null, "window"));
                 wm.getRealDisplaySize(point);
+                rotation = wm.getRotation();
+            }
+            if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
+                int temp = point.x;
+                point.x = point.y;
+                point.y = temp;
             }
             return point;
         } catch (Exception e) {
