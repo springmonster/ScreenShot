@@ -52,7 +52,7 @@ public class CommandInstall {
         try {
             Process process = Runtime
                     .getRuntime()
-                    .exec("adb shell ");
+                    .exec("adb shell");
 
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 

@@ -75,14 +75,12 @@ public class PhoneClient {
     }
 
     private static void init() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        System.out.println("init input manager");
         im = (InputManager) InputManager.class.getDeclaredMethod("getInstance", new Class[0]).invoke(null);
         MotionEvent.class.getDeclaredMethod("obtain").setAccessible(true);
         injectInputEventMethod = InputManager.class.getMethod("injectInputEvent", InputEvent.class, Integer.TYPE);
     }
 
     private static void handleLocalSocket(LocalSocket localSocket) {
-        System.out.println("handle local socket");
         readSocket(localSocket);
         writeSocket(localSocket);
     }
@@ -110,7 +108,6 @@ public class PhoneClient {
 
                         dataOutputStream.writeInt(byteArrayOutputStream.size());
 
-//                        writeInt(bufferedOutputStream, byteArrayOutputStream.size());
                         bufferedOutputStream.write(byteArrayOutputStream.toByteArray());
                         bufferedOutputStream.flush();
                     }
@@ -203,8 +200,6 @@ public class PhoneClient {
             String[] s = input.split("#");
             point.x = Integer.parseInt(s[0]);
             point.y = Integer.parseInt(s[1]);
-            System.out.println("click x is " + point.x);
-            System.out.println("click y is " + point.y);
             return point;
         } catch (Exception e) {
             e.printStackTrace();
@@ -217,24 +212,24 @@ public class PhoneClient {
     }
 
     private static void pressHome() throws InvocationTargetException, IllegalAccessException {
-        sendKeyEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_KEYBOARD, 3, false);
+        sendKeyEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_KEYBOARD, KeyEvent.KEYCODE_HOME, false);
     }
 
     private static void pressBack() throws InvocationTargetException, IllegalAccessException {
-        sendKeyEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_KEYBOARD, 4, false);
+        sendKeyEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_KEYBOARD, KeyEvent.KEYCODE_BACK, false);
     }
 
     private static void touchDown(float clientX, float clientY) throws InvocationTargetException, IllegalAccessException {
         downTime = SystemClock.uptimeMillis();
-        injectMotionEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_TOUCHSCREEN, 0, downTime, downTime, clientX, clientY, 1.0f);
+        injectMotionEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_TOUCHSCREEN, MotionEvent.ACTION_DOWN, downTime, downTime, clientX, clientY, 1.0f);
     }
 
     private static void touchUp(float clientX, float clientY) throws InvocationTargetException, IllegalAccessException {
-        injectMotionEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_TOUCHSCREEN, 1, downTime, SystemClock.uptimeMillis(), clientX, clientY, 1.0f);
+        injectMotionEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_TOUCHSCREEN, MotionEvent.ACTION_UP, downTime, SystemClock.uptimeMillis(), clientX, clientY, 1.0f);
     }
 
     private static void touchMove(float clientX, float clientY) throws InvocationTargetException, IllegalAccessException {
-        injectMotionEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_TOUCHSCREEN, 2, downTime, SystemClock.uptimeMillis(), clientX, clientY, 1.0f);
+        injectMotionEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_TOUCHSCREEN, MotionEvent.ACTION_MOVE, downTime, SystemClock.uptimeMillis(), clientX, clientY, 1.0f);
     }
 
     private static void injectMotionEvent(InputManager im, Method injectInputEventMethod, int inputSource, int action, long downTime, long eventTime, float x, float y, float pressure) throws InvocationTargetException, IllegalAccessException {
