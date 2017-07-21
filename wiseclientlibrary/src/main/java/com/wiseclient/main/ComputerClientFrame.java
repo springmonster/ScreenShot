@@ -99,7 +99,7 @@ public class ComputerClientFrame extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 try {
-                    read("127.0.0.1", "9999");
+                    startSocket("127.0.0.1", "9999");
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
@@ -261,7 +261,7 @@ public class ComputerClientFrame extends JFrame {
         return mJpanelBottomBar;
     }
 
-    private void read(final String ip, final String port) throws IOException {
+    private void startSocket(final String ip, final String port) throws IOException {
         new Thread() {
             @Override
             public void run() {
@@ -331,6 +331,13 @@ public class ComputerClientFrame extends JFrame {
     }
 
     public static void main(String[] args) throws IOException {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                CommandInstall.installDex();
+            }
+        }).start();
+
         new ComputerClientFrame().setVisible(true);
     }
 }

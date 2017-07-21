@@ -18,93 +18,75 @@ public class CommandInstall {
     }
 
     public static void installDex() {
-        String findApkCmd = "export CLASSPATH=/sdcard/PhoneClient.dex";
-        String startApkCmd = "exec app_process /sdcard com.wise.wisescreenshot.PhoneClient";
-        execCommand(new String[]{findApkCmd, startApkCmd});
+        execAdbForwardCommand();
+        execAppProcessCommand();
     }
 
-    private static void execCommand(String[] command) {
+    private static void execAdbForwardCommand() {
+        System.out.println("-----> adb forward command start <------");
         try {
             Process process = Runtime
                     .getRuntime()
-                    .exec("./adb shell "); // adb
+                    .exec("sh");
 
-            BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-
-            for (String cmd :
-                    command) {
-                bufferedWriter.write(cmd);
-                bufferedWriter.write("\n");
-            }
-
-            bufferedWriter.flush();
-            System.out.println("shell write finished...");
-            readError(process.getErrorStream());
-            adbCommand("forward tcp:9999 localabstract:wise-screen-shot");
-            readResult(process.getInputStream());
-
-            while (true) {
-                Thread.sleep(Integer.MAX_VALUE);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void readError(final InputStream errorStream) {
-        new Thread(){
-            @Override
-            public void run() {
-                super.run();
-                readResult(errorStream);
-            }
-        }.start();
-    }
-
-    private static void adbCommand(String com) {
-        System.out.println("adbCommand...." + com);
-        command("sh", "./adb " + com);
-    }
-
-    private static void command(String c, String com) {
-        System.out.println("---> " + c + com);
-        try {
-            Process process = Runtime
-                    .getRuntime()
-                    .exec(c); // adb
             final BufferedWriter outputStream = new BufferedWriter(
                     new OutputStreamWriter(process.getOutputStream()));
 
-
-            outputStream.write(com);
+            outputStream.write("adb forward tcp:9999 localabstract:wisescreenshot");
             outputStream.write("\n");
             outputStream.write("exit\n");
             outputStream.flush();
 
-            int i = process.waitFor();
-            readResult(process.getInputStream());
-
-
-            System.out.println("------END-------");
+            process.waitFor();
+            readExecCommandResult(process.getInputStream());
+            System.out.println("-----> adb forward command end <------");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private static void readResult(final InputStream stream) {
+    private static void execAppProcessCommand() {
+        String findApkCmd = "export CLASSPATH=/data/app/com.wise.wisescreenshot-1/base.apk";
+        String startApkCmd = "exec app_process /system/bin com.wise.wisescreenshot.PhoneClient";
+        String[] commands = new String[]{findApkCmd, startApkCmd};
+        try {
+            Process process = Runtime
+                    .getRuntime()
+                    .exec("adb shell ");
 
-        System.out.println("read result.....");
+            BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+
+            for (String cmd : commands) {
+                bufferedWriter.write(cmd);
+                bufferedWriter.write("\n");
+            }
+            bufferedWriter.flush();
+
+            readError(process.getErrorStream());
+            readExecCommandResult(process.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void readError(final InputStream errorStream) {
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                readExecCommandResult(errorStream);
+            }
+        }.start();
+    }
+
+    private static void readExecCommandResult(final InputStream stream) {
         try {
             String line;
-            final BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(stream));
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 
             while ((line = reader.readLine()) != null) {
                 System.out.println(line);
             }
-            System.out.println("-------END------");
         } catch (IOException e) {
             e.printStackTrace();
             try {

@@ -52,29 +52,14 @@ public class PhoneClient {
         try {
             startLocalServerSocket();
         } catch (Exception e) {
-            System.out.println("Phone client start error1");
+            System.out.println("Phone client start error");
             System.out.println(e.getMessage());
-            try {
-                mLocalServerSocket.close();
-                startLocalServerSocket();
-            } catch (IOException e1) {
-                System.out.println("Phone client start error2");
-                e1.printStackTrace();
-                System.out.println(e1.getMessage());
-            } catch (NoSuchMethodException e1) {
-                e1.printStackTrace();
-            } catch (IllegalAccessException e1) {
-                e1.printStackTrace();
-            } catch (InvocationTargetException e1) {
-                e1.printStackTrace();
-            } catch (ClassNotFoundException e1) {
-                e1.printStackTrace();
-            }
         }
     }
 
     private static void startLocalServerSocket() throws IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        mLocalServerSocket = new LocalServerSocket("wise-screen-shot");
+        System.out.println("start local server socket");
+        mLocalServerSocket = new LocalServerSocket("wisescreenshot");
         init();
 
         while (true) {
@@ -84,12 +69,13 @@ public class PhoneClient {
                 handleLocalSocket(localSocket);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
-                mLocalServerSocket = new LocalServerSocket("wise-screen-shot");
+                mLocalServerSocket = new LocalServerSocket("wisescreenshot");
             }
         }
     }
 
     private static void init() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        System.out.println("init input manager");
         im = (InputManager) InputManager.class.getDeclaredMethod("getInstance", new Class[0]).invoke(null);
         MotionEvent.class.getDeclaredMethod("obtain").setAccessible(true);
         injectInputEventMethod = InputManager.class.getMethod("injectInputEvent", InputEvent.class, Integer.TYPE);
