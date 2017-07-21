@@ -267,7 +267,8 @@ public class ComputerClientFrame extends JFrame {
                         mDisplayX = dataInputStream.readInt();
                         mDisplayY = dataInputStream.readInt();
 
-                        int length = readInt(inputStream);
+                        int length = dataInputStream.readInt();
+
                         if (bytes == null) {
                             bytes = new byte[length];
                         }
@@ -287,15 +288,6 @@ public class ComputerClientFrame extends JFrame {
                 }
             }
         }.start();
-    }
-
-    private int readInt(InputStream inputStream) throws IOException {
-        int b1 = inputStream.read();
-        int b2 = inputStream.read();
-        int b3 = inputStream.read();
-        int b4 = inputStream.read();
-
-        return (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
     }
 
     public static void main(String[] args) throws IOException {

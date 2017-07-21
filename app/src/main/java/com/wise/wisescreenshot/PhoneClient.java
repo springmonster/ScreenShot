@@ -20,9 +20,7 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -68,9 +66,9 @@ public class PhoneClient {
     }
 
     private static void init() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        im = (InputManager) InputManager.class.getDeclaredMethod("getInstance", new Class[0]).invoke(null, new Object[0]);
-        MotionEvent.class.getDeclaredMethod("obtain", new Class[0]).setAccessible(true);
-        injectInputEventMethod = InputManager.class.getMethod("injectInputEvent", new Class[]{InputEvent.class, Integer.TYPE});
+        im = (InputManager) InputManager.class.getDeclaredMethod("getInstance", new Class[0]).invoke(null);
+        MotionEvent.class.getDeclaredMethod("obtain").setAccessible(true);
+        injectInputEventMethod = InputManager.class.getMethod("injectInputEvent", InputEvent.class, Integer.TYPE);
     }
 
     private static void handleLocalSocket(LocalSocket localSocket) {
@@ -99,7 +97,10 @@ public class PhoneClient {
                         }
                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 60, byteArrayOutputStream);
-                        writeInt(bufferedOutputStream, byteArrayOutputStream.size());
+
+                        dataOutputStream.writeInt(byteArrayOutputStream.size());
+
+//                        writeInt(bufferedOutputStream, byteArrayOutputStream.size());
                         bufferedOutputStream.write(byteArrayOutputStream.toByteArray());
                         bufferedOutputStream.flush();
                     }
@@ -109,13 +110,6 @@ public class PhoneClient {
                 }
             }
         }).start();
-    }
-
-    private static void writeInt(OutputStream outputStream, int v) throws IOException {
-        outputStream.write(v >> 24);
-        outputStream.write(v >> 16);
-        outputStream.write(v >> 8);
-        outputStream.write(v);
     }
 
     private static void readSocket(final LocalSocket localSocket) {
@@ -236,11 +230,11 @@ public class PhoneClient {
     private static void injectMotionEvent(InputManager im, Method injectInputEventMethod, int inputSource, int action, long downTime, long eventTime, float x, float y, float pressure) throws InvocationTargetException, IllegalAccessException {
         MotionEvent event = MotionEvent.obtain(downTime, eventTime, action, x, y, pressure, 1.0f, 0, 1.0f, 1.0f, 0, 0);
         event.setSource(inputSource);
-        injectInputEventMethod.invoke(im, new Object[]{event, Integer.valueOf(0)});
+        injectInputEventMethod.invoke(im, event, Integer.valueOf(0));
     }
 
     private static void injectKeyEvent(InputManager im, Method injectInputEventMethod, KeyEvent event) throws InvocationTargetException, IllegalAccessException {
-        injectInputEventMethod.invoke(im, new Object[]{event, Integer.valueOf(0)});
+        injectInputEventMethod.invoke(im, event, Integer.valueOf(0));
     }
 
     private static void sendKeyEvent(InputManager im, Method injectInputEventMethod, int inputSource, int keyCode, boolean shift) throws InvocationTargetException, IllegalAccessException {
@@ -268,7 +262,7 @@ public class PhoneClient {
             } else {
                 surfaceClassName = "android.view.SurfaceControl";
             }
-            Bitmap bitmap = (Bitmap) Class.forName(surfaceClassName).getDeclaredMethod("screenshot", new Class[]{Integer.TYPE, Integer.TYPE}).invoke(null, new Object[]{Integer.valueOf(size.x), Integer.valueOf(size.y)});
+            Bitmap bitmap = (Bitmap) Class.forName(surfaceClassName).getDeclaredMethod("screenshot", new Class[]{Integer.TYPE, Integer.TYPE}).invoke(null, Integer.valueOf(size.x), Integer.valueOf(size.y));
             return bitmap;
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -281,18 +275,18 @@ public class PhoneClient {
      */
     private static Point getCurrentDisplaySize() {
         try {
-            Method getServiceMethod = Class.forName("android.os.ServiceManager").getDeclaredMethod("getService", new Class[]{String.class});
+            Method getServiceMethod = Class.forName("android.os.ServiceManager").getDeclaredMethod("getService", String.class);
             Point point = new Point();
             IWindowManager wm;
             if (Build.VERSION.SDK_INT >= 18) {
-                wm = IWindowManager.Stub.asInterface((IBinder) getServiceMethod.invoke(null, new Object[]{"window"}));
+                wm = IWindowManager.Stub.asInterface((IBinder) getServiceMethod.invoke(null, "window"));
                 wm.getInitialDisplaySize(0, point);
             } else if (Build.VERSION.SDK_INT == 17) {
-                DisplayInfo di = IDisplayManager.Stub.asInterface((IBinder) getServiceMethod.invoke(null, new Object[]{"display"})).getDisplayInfo(0);
+                DisplayInfo di = IDisplayManager.Stub.asInterface((IBinder) getServiceMethod.invoke(null, "display")).getDisplayInfo(0);
                 point.x = ((Integer) DisplayInfo.class.getDeclaredField("logicalWidth").get(di)).intValue();
                 point.y = ((Integer) DisplayInfo.class.getDeclaredField("logicalHeight").get(di)).intValue();
             } else {
-                wm = IWindowManager.Stub.asInterface((IBinder) getServiceMethod.invoke(null, new Object[]{"window"}));
+                wm = IWindowManager.Stub.asInterface((IBinder) getServiceMethod.invoke(null, "window"));
                 wm.getRealDisplaySize(point);
             }
             return point;

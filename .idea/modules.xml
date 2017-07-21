@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/WiseScreenShot.iml" filepath="$PROJECT_DIR$/WiseScreenShot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ScreenShot.iml" filepath="$PROJECT_DIR$/ScreenShot.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/wiseclientlibrary/wiseclientlibrary.iml" filepath="$PROJECT_DIR$/wiseclientlibrary/wiseclientlibrary.iml" />
     </modules>
