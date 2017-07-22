@@ -32,7 +32,7 @@ public class CommandInstall {
             final BufferedWriter outputStream = new BufferedWriter(
                     new OutputStreamWriter(process.getOutputStream()));
 
-            outputStream.write("adb forward tcp:9999 localabstract:wisescreenshot");
+            outputStream.write("./adb forward tcp:9999 localabstract:wisescreenshot");
             outputStream.write("\n");
             outputStream.write("exit\n");
             outputStream.flush();
@@ -52,7 +52,7 @@ public class CommandInstall {
         try {
             Process process = Runtime
                     .getRuntime()
-                    .exec("adb shell");
+                    .exec("./adb shell");
 
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
