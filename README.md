@@ -59,6 +59,5 @@ LocalSocketServer
 ------------------------
 WiseScreenShot
 ------------------------
-* adb push PhoneClient.dex /sdcard
-* 运行CommandInstall.java
-* 运行ComputerClientFrame.java
+* 编译app工程并将apk安装到手机上
+* 运行wiseclientlibrary中的ComputerClientFrame，点击“连接手机”按钮
