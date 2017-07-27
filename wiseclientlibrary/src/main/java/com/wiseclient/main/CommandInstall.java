@@ -14,9 +14,19 @@ import java.io.OutputStreamWriter;
 
 public class CommandInstall {
     private static final String ADB_PATH = getAdbFile();
+    private static boolean isUnix = true;
 
     public static void main(String[] args) {
+        checkPlatform();
         installDex();
+    }
+
+    private static void checkPlatform() {
+        String os = System.getProperty("os.name");
+        System.out.println("os system is " + os);
+        if (os.toLowerCase().contains("win")) {
+            isUnix = false;
+        }
     }
 
     public static void installDex() {
@@ -27,9 +37,12 @@ public class CommandInstall {
     private static void execAdbForwardCommand() {
         System.out.println("-----> adb forward command start <------");
         try {
-            Process process = Runtime
-                    .getRuntime()
-                    .exec("sh");
+            Process process;
+            if (isUnix) {
+                process = Runtime.getRuntime().exec("sh");
+            } else {
+                process = Runtime.getRuntime().exec("cmd.exe");
+            }
 
             final BufferedWriter outputStream = new BufferedWriter(
                     new OutputStreamWriter(process.getOutputStream()));
@@ -52,9 +65,12 @@ public class CommandInstall {
         String startApkCmd = "exec app_process /system/bin com.wise.wisescreenshot.PhoneClient";
         String[] commands = new String[]{findApkCmd, startApkCmd};
         try {
-            Process process = Runtime
-                    .getRuntime()
-                    .exec(ADB_PATH + " shell");
+            Process process;
+            if (isUnix) {
+                process = Runtime.getRuntime().exec(ADB_PATH + " shell");
+            } else {
+                process = Runtime.getRuntime().exec("cmd.exe " + ADB_PATH + " shell");
+            }
 
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
