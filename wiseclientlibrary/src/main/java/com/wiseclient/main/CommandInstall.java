@@ -2,6 +2,7 @@ package com.wiseclient.main;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,6 +13,7 @@ import java.io.OutputStreamWriter;
  */
 
 public class CommandInstall {
+    private static final String ADB_PATH = getAdbFile();
 
     public static void main(String[] args) {
         installDex();
@@ -32,7 +34,7 @@ public class CommandInstall {
             final BufferedWriter outputStream = new BufferedWriter(
                     new OutputStreamWriter(process.getOutputStream()));
 
-            outputStream.write("./adb forward tcp:9999 localabstract:wisescreenshot");
+            outputStream.write(ADB_PATH + " forward tcp:9999 localabstract:wisescreenshot");
             outputStream.write("\n");
             outputStream.write("exit\n");
             outputStream.flush();
@@ -52,7 +54,7 @@ public class CommandInstall {
         try {
             Process process = Runtime
                     .getRuntime()
-                    .exec("./adb shell");
+                    .exec(ADB_PATH + " shell");
 
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
@@ -95,5 +97,11 @@ public class CommandInstall {
                 e1.printStackTrace();
             }
         }
+    }
+
+    private static String getAdbFile() {
+        File file = new File("");
+        String path = file.getAbsolutePath();
+        return path + "/adb";
     }
 }
