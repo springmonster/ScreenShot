@@ -13,25 +13,31 @@ import java.io.OutputStreamWriter;
  */
 
 public class CommandInstall {
-    private static final String ADB_PATH = getAdbFile();
+    private static String ADB_PATH = getAdbFileForLinux();
     private static boolean isUnix = true;
 
-    public static void main(String[] args) {
+//    public static void main(String[] args) {
+//        installDex();
+//    }
+
+    public static void installDex() {
         checkPlatform();
-        installDex();
+        execAdbForwardCommand();
+        execAppProcessCommand();
     }
 
     private static void checkPlatform() {
         String os = System.getProperty("os.name");
         System.out.println("os system is " + os);
-        if (os.toLowerCase().contains("win")) {
-            isUnix = false;
-        }
-    }
 
-    public static void installDex() {
-        execAdbForwardCommand();
-        execAppProcessCommand();
+        if (os.toLowerCase().contains("linux")) {
+            ADB_PATH = getAdbFileForLinux();
+        } else if (os.toLowerCase().contains("win")) {
+            isUnix = false;
+            ADB_PATH = getAdbFileForWin();
+        } else if (os.toLowerCase().contains("mac")) {
+            ADB_PATH = getAdbFileForMacOS();
+        }
     }
 
     private static void execAdbForwardCommand() {
@@ -41,7 +47,7 @@ public class CommandInstall {
             if (isUnix) {
                 process = Runtime.getRuntime().exec("sh");
             } else {
-                process = Runtime.getRuntime().exec("cmd.exe");
+                process = Runtime.getRuntime().exec("cmd /c ");
             }
 
             final BufferedWriter outputStream = new BufferedWriter(
@@ -69,7 +75,7 @@ public class CommandInstall {
             if (isUnix) {
                 process = Runtime.getRuntime().exec(ADB_PATH + " shell");
             } else {
-                process = Runtime.getRuntime().exec("cmd.exe " + ADB_PATH + " shell");
+                process = Runtime.getRuntime().exec("cmd /c " + ADB_PATH + " shell");
             }
 
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
@@ -115,9 +121,21 @@ public class CommandInstall {
         }
     }
 
-    private static String getAdbFile() {
+    private static String getAdbFileForLinux() {
         File file = new File("");
         String path = file.getAbsolutePath();
-        return path + "/adb";
+        return path + "/linux/adb";
+    }
+
+    private static String getAdbFileForWin() {
+        File file = new File("");
+        String path = file.getAbsolutePath();
+        return path + "/windows/adb";
+    }
+
+    private static String getAdbFileForMacOS() {
+        File file = new File("");
+        String path = file.getAbsolutePath();
+        return path + "/macos/adb";
     }
 }
