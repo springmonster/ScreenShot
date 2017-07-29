@@ -4,7 +4,7 @@ import android.os.IBinder;
 import android.view.DisplayInfo;
 
 /**
- * Created by wanjian on 2017/4/4.
+ * Created by kuanghaochuan on 2017/7/13.
  */
 
 public interface IDisplayManager {

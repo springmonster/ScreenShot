@@ -60,29 +60,33 @@ public class ComputerClientFrame extends JFrame {
     private int mMoveNewY;
 
     public ComputerClientFrame() throws IOException {
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setBounds(360, 20, 1000, 1000);
-        this.setTitle("屏幕共享");
+        createComputerClientFrame();
 
-        mMainPanel = new JPanel();
-        mMainPanel.setBounds(0, 0, 1000, 1000);
-        mMainPanel.setLayout(null);
-        mMainPanel.setBackground(new Color(220, 240, 250));
+        createMainPanel();
 
-        mConnectBtn = new JButton("连接手机");
-        mConnectBtn.setBounds(0, 0, 510, 20);
-        mMainPanel.add(mConnectBtn);
+        createConnectBtn();
 
-        mImageLabel = new JLabel();
-        mImageLabel.setBackground(Color.BLACK);
-        mImageLabel.setOpaque(true);
-        mImageLabel.setBounds(0, 20, 510, 920);
-        mMainPanel.add(mImageLabel);
+        createImageLabel();
 
         createBottomBar();
 
-        initSaveButton(mMainPanel);
+        createSaveButton();
 
+        createScriptPanel();
+
+        this.add(mMainPanel);
+
+        mUserActionInterface = new UserAction(mJTextAreaShowScript);
+    }
+
+    private void createComputerClientFrame() {
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        this.setBounds(360, 20, 1000, 1000);
+        this.setTitle("屏幕共享");
+        this.setResizable(false);
+    }
+
+    private void createScriptPanel() {
         mJTextAreaShowScript = new JTextArea();
         mJTextAreaShowScript.setBounds(510, 20, 490, 960);
         mJTextAreaShowScript.setLineWrap(true);
@@ -93,23 +97,20 @@ public class ComputerClientFrame extends JFrame {
         mJScrollPane.setBounds(510, 20, 490, 960);
 
         mMainPanel.add(mJScrollPane);
+    }
 
-        this.add(mMainPanel);
+    private void createMainPanel() {
+        mMainPanel = new JPanel();
+        mMainPanel.setBounds(0, 0, 1000, 1000);
+        mMainPanel.setLayout(null);
+        mMainPanel.setBackground(new Color(220, 240, 250));
+    }
 
-        mUserActionInterface = new UserAction(mJTextAreaShowScript);
-
-        mConnectBtn.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                try {
-                    startSocket("127.0.0.1", "9999");
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        });
-
-
+    private void createImageLabel() {
+        mImageLabel = new JLabel();
+        mImageLabel.setBackground(Color.BLACK);
+        mImageLabel.setOpaque(true);
+        mImageLabel.setBounds(0, 20, 510, 920);
         mImageLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent mouseEvent) {
@@ -125,7 +126,9 @@ public class ComputerClientFrame extends JFrame {
                     writer.write("UP" + calcX + "#" + calcY);
                     writer.newLine();
                     writer.flush();
-                    mUserActionInterface.actionViewClick(calcX, calcY);
+                    if (mUserActionInterface != null) {
+                        mUserActionInterface.actionViewClick(calcX, calcY);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -143,7 +146,9 @@ public class ComputerClientFrame extends JFrame {
                     if (isMove) {
                         mMoveNewX = calcXInDisplay(x);
                         mMoveNewY = calcYInDisplay(y);
-                        mUserActionInterface.actionViewMove(mMoveOldX, mMoveOldY, mMoveNewX, mMoveNewY);
+                        if (mUserActionInterface != null) {
+                            mUserActionInterface.actionViewMove(mMoveOldX, mMoveOldY, mMoveNewX, mMoveNewY);
+                        }
                     }
                     isMove = false;
                 } catch (Exception e) {
@@ -175,9 +180,26 @@ public class ComputerClientFrame extends JFrame {
                 }
             }
         });
+        mMainPanel.add(mImageLabel);
     }
 
-    private void initSaveButton(JPanel mainPanel) {
+    private void createConnectBtn() {
+        mConnectBtn = new JButton("连接手机");
+        mConnectBtn.setBounds(0, 0, 510, 20);
+        mConnectBtn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                try {
+                    startSocket("127.0.0.1", "9999");
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+        mMainPanel.add(mConnectBtn);
+    }
+
+    private void createSaveButton() {
         mJButtonSaveFile = new JButton();
         mJButtonSaveFile.setText("保存脚本");
         mJButtonSaveFile.setBounds(510, 0, 490, 20);
@@ -194,7 +216,7 @@ public class ComputerClientFrame extends JFrame {
                 }
             }
         });
-        mainPanel.add(mJButtonSaveFile);
+        mMainPanel.add(mJButtonSaveFile);
     }
 
     private int calcXInDisplay(int input) {
@@ -242,7 +264,9 @@ public class ComputerClientFrame extends JFrame {
                     writer.write("MENU");
                     writer.newLine();
                     writer.flush();
-                    mUserActionInterface.actionMenuPress();
+                    if (mUserActionInterface != null) {
+                        mUserActionInterface.actionMenuPress();
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -256,7 +280,9 @@ public class ComputerClientFrame extends JFrame {
                     writer.write("HOME");
                     writer.newLine();
                     writer.flush();
-                    mUserActionInterface.actionHomePress();
+                    if (mUserActionInterface != null) {
+                        mUserActionInterface.actionHomePress();
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -270,7 +296,9 @@ public class ComputerClientFrame extends JFrame {
                     writer.write("BACK");
                     writer.newLine();
                     writer.flush();
-                    mUserActionInterface.actionBackPress();
+                    if (mUserActionInterface != null) {
+                        mUserActionInterface.actionBackPress();
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
