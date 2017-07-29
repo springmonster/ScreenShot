@@ -233,6 +233,8 @@ public class ComputerClientFrame extends JFrame {
         File file = new File("");
         String path = file.getAbsolutePath();
 
+        System.out.println("current path is " + path);
+
         ImageIcon menuImageIcon = new ImageIcon(ImageIO.read(new File(path + "/wiseclientlibrary/images/menu.png")));
         ImageIcon homeImageIcon = new ImageIcon(ImageIO.read(new File(path + "/wiseclientlibrary/images/home.png")));
         ImageIcon backImageIcon = new ImageIcon(ImageIO.read(new File(path + "/wiseclientlibrary/images/back.png")));
