@@ -10,6 +10,7 @@ import android.net.LocalSocket;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.SystemClock;
+import android.support.annotation.RequiresApi;
 import android.support.v4.view.InputDeviceCompat;
 import android.view.DisplayInfo;
 import android.view.IWindowManager;
@@ -48,11 +49,15 @@ public class PhoneClient {
     private static LocalServerSocket mLocalServerSocket;
 
     public static void main(String[] args) {
-        System.out.println("Phone client start");
+        startUnixSocket();
+    }
+
+    private static void startUnixSocket() {
+        System.out.println("start unix socket");
         try {
             startLocalServerSocket();
         } catch (Exception e) {
-            System.out.println("Phone client start error");
+            System.out.println("start unix socket error");
             System.out.println(e.getMessage());
         }
     }
@@ -63,17 +68,23 @@ public class PhoneClient {
         init();
 
         while (true) {
-            System.out.println("listening...");
+            System.out.println("local server socket listening...");
             try {
                 LocalSocket localSocket = mLocalServerSocket.accept();
                 handleLocalSocket(localSocket);
             } catch (Exception e) {
+                System.out.println("local server socket listening error");
                 System.out.println(e.getMessage());
-                mLocalServerSocket = new LocalServerSocket("wisescreenshot");
+                try {
+                    mLocalServerSocket = new LocalServerSocket("wisescreenshot");
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
             }
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     private static void init() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         im = (InputManager) InputManager.class.getDeclaredMethod("getInstance", new Class[0]).invoke(null);
         MotionEvent.class.getDeclaredMethod("obtain").setAccessible(true);

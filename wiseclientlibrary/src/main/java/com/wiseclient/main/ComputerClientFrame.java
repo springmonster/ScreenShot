@@ -10,6 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -84,6 +86,14 @@ public class ComputerClientFrame extends JFrame {
         this.setBounds(360, 20, 1000, 1000);
         this.setTitle("屏幕共享");
         this.setResizable(false);
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.out.println("window closing");
+                CommandInstall.execExitAppProcessCommand();
+                super.windowClosing(e);
+            }
+        });
     }
 
     private void createScriptPanel() {
