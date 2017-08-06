@@ -14,4 +14,16 @@ public interface UserActionInterface {
     void actionMenuPress();
 
     void actionHomePress();
+
+    void actionKeyUpPress();
+
+    void actionKeyDownPress();
+
+    void actionKeyLeftPress();
+
+    void actionKeyRightPress();
+
+    void actionKeyEnterPress();
+
+    void actionKeyBackPress();
 }

@@ -271,6 +271,12 @@ public class ComputerClientFrame extends JFrame {
                         mDisplayX = dataInputStream.readInt();
                         mDisplayY = dataInputStream.readInt();
                         if (mDisplayOldX != mDisplayX && mDisplayOldY != mDisplayY) {
+                            // 如果为机顶盒的应用，则mDisplayX是大于mDisplayY的，需要改变成为横屏状态
+                            if (mDisplayOldX == 0 && mDisplayOldY == 0) {
+                                if (mDisplayX > mDisplayY) {
+                                    changeDisplayOrientation(false);
+                                }
+                            }
                             if (mDisplayOldX < mDisplayOldY && mDisplayX > mDisplayY) {
                                 //此时由竖屏状态改变为横屏状态
                                 changeDisplayOrientation(false);
@@ -437,16 +443,34 @@ public class ComputerClientFrame extends JFrame {
 
                 if (code == KeyEvent.VK_UP) {
                     writer.write("KEY_UP");
+                    if (mUserActionInterface != null) {
+                        mUserActionInterface.actionKeyUpPress();
+                    }
                 } else if (code == KeyEvent.VK_DOWN) {
                     writer.write("KEY_DOWN");
+                    if (mUserActionInterface != null) {
+                        mUserActionInterface.actionKeyDownPress();
+                    }
                 } else if (code == KeyEvent.VK_LEFT) {
                     writer.write("KEY_LEFT");
+                    if (mUserActionInterface != null) {
+                        mUserActionInterface.actionKeyLeftPress();
+                    }
                 } else if (code == KeyEvent.VK_RIGHT) {
                     writer.write("KEY_RIGHT");
+                    if (mUserActionInterface != null) {
+                        mUserActionInterface.actionKeyRightPress();
+                    }
                 } else if (code == KeyEvent.VK_ENTER) {
                     writer.write("KEY_ENTER");
+                    if (mUserActionInterface != null) {
+                        mUserActionInterface.actionKeyEnterPress();
+                    }
                 } else if (code == KeyEvent.VK_ESCAPE) {
                     writer.write("KEY_ESC");
+                    if (mUserActionInterface != null) {
+                        mUserActionInterface.actionKeyBackPress();
+                    }
                 }
 
                 writer.newLine();

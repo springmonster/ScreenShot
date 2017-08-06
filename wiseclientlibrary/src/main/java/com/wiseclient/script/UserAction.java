@@ -73,4 +73,82 @@ public class UserAction implements UserActionInterface {
 
         mDisplayScript.handleScript(stringBuilder);
     }
+
+    @Override
+    public void actionKeyUpPress() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("device.press('KEYCODE_DPAD_UP',MonkeyDevice.DOWN_AND_UP)");
+        stringBuilder.append("\n");
+        stringBuilder.append("MonkeyRunner.sleep(1.5)");
+        stringBuilder.append("\n");
+
+        System.out.println("actionKeyUpPress");
+
+        mDisplayScript.handleScript(stringBuilder);
+    }
+
+    @Override
+    public void actionKeyDownPress() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("device.press('KEYCODE_DPAD_DOWN',MonkeyDevice.DOWN_AND_UP)");
+        stringBuilder.append("\n");
+        stringBuilder.append("MonkeyRunner.sleep(1.5)");
+        stringBuilder.append("\n");
+
+        System.out.println("actionKeyDownPress");
+
+        mDisplayScript.handleScript(stringBuilder);
+    }
+
+    @Override
+    public void actionKeyLeftPress() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("device.press('KEYCODE_DPAD_LEFT',MonkeyDevice.DOWN_AND_UP)");
+        stringBuilder.append("\n");
+        stringBuilder.append("MonkeyRunner.sleep(1.5)");
+        stringBuilder.append("\n");
+
+        System.out.println("actionKeyLeftPress");
+
+        mDisplayScript.handleScript(stringBuilder);
+    }
+
+    @Override
+    public void actionKeyRightPress() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("device.press('KEYCODE_DPAD_RIGHT',MonkeyDevice.DOWN_AND_UP)");
+        stringBuilder.append("\n");
+        stringBuilder.append("MonkeyRunner.sleep(1.5)");
+        stringBuilder.append("\n");
+
+        System.out.println("actionKeyRightPress");
+
+        mDisplayScript.handleScript(stringBuilder);
+    }
+
+    @Override
+    public void actionKeyEnterPress() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("device.press('KEYCODE_DPAD_CENTER',MonkeyDevice.DOWN_AND_UP)");
+        stringBuilder.append("\n");
+        stringBuilder.append("MonkeyRunner.sleep(1.5)");
+        stringBuilder.append("\n");
+
+        System.out.println("actionKeyEnterPress");
+
+        mDisplayScript.handleScript(stringBuilder);
+    }
+
+    @Override
+    public void actionKeyBackPress() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("device.press('KEYCODE_BACK',MonkeyDevice.DOWN_AND_UP)");
+        stringBuilder.append("\n");
+        stringBuilder.append("MonkeyRunner.sleep(1.5)");
+        stringBuilder.append("\n");
+
+        System.out.println("actionKeyBackPress");
+
+        mDisplayScript.handleScript(stringBuilder);
+    }
 }
