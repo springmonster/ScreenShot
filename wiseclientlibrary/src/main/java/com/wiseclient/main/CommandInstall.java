@@ -28,7 +28,30 @@ public class CommandInstall {
     }
 
     private static void execAdbPushCommand() {
+        String apk = getApk();
+        System.out.println("-----> adb shell push command start <------");
+        try {
+            Process process;
+            if (isUnix) {
+                process = Runtime.getRuntime().exec("sh");
+            } else {
+                process = Runtime.getRuntime().exec("cmd /c ");
+            }
 
+            final BufferedWriter outputStream = new BufferedWriter(
+                    new OutputStreamWriter(process.getOutputStream()));
+
+            outputStream.write(ADB_PATH + " push " + apk + " /sdcard/PhoneClient.apk");
+            outputStream.write("\n");
+            outputStream.write("exit\n");
+            outputStream.flush();
+
+            process.waitFor();
+            readExecCommandResult(process.getInputStream());
+            System.out.println("-----> adb push forward command end <------");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static void checkPlatform() {
@@ -72,8 +95,8 @@ public class CommandInstall {
     }
 
     public static void execAppProcessCommand() {
-        String findApkCmd = "export CLASSPATH=/data/app/com.wise.wisescreenshot-1/base.apk";
-//        String findApkCmd = "export CLASSPATH=/sdcard/screenshot.apk";
+//        String findApkCmd = "export CLASSPATH=/data/app/com.wise.wisescreenshot-1/base.apk";
+        String findApkCmd = "export CLASSPATH=/sdcard/PhoneClient.apk";
         String startApkCmd = "exec app_process /system/bin com.wise.wisescreenshot.PhoneClient";
 
         String[] commands;
@@ -147,6 +170,12 @@ public class CommandInstall {
         File file = new File("");
         String path = file.getAbsolutePath();
         return path + "/macos/adb";
+    }
+
+    private static String getApk() {
+        File file = new File("");
+        String path = file.getAbsolutePath();
+        return path + "/apk/PhoneClient.apk";
     }
 
     public static void execExitAppProcessCommand() {
