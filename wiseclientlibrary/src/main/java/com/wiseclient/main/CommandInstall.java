@@ -28,14 +28,16 @@ public class CommandInstall {
     }
 
     private static void execAdbPushCommand() {
-        String apk = getApk();
-        System.out.println("-----> adb shell push command start <------");
+        String apk = null;
+        System.out.println("-----> adb shell push command start <------ ");
         try {
             Process process;
             if (isUnix) {
+                apk = getApk();
                 process = Runtime.getRuntime().exec("sh");
             } else {
-                process = Runtime.getRuntime().exec("cmd /c ");
+                apk = getApkForWin();
+                process = Runtime.getRuntime().exec("cmd");
             }
 
             final BufferedWriter outputStream = new BufferedWriter(
@@ -48,7 +50,7 @@ public class CommandInstall {
 
             process.waitFor();
             readExecCommandResult(process.getInputStream());
-            System.out.println("-----> adb push forward command end <------");
+            System.out.println("-----> adb shell push command end <------");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -75,7 +77,7 @@ public class CommandInstall {
             if (isUnix) {
                 process = Runtime.getRuntime().exec("sh");
             } else {
-                process = Runtime.getRuntime().exec("cmd /c ");
+                process = Runtime.getRuntime().exec("cmd");
             }
 
             final BufferedWriter outputStream = new BufferedWriter(
@@ -163,7 +165,7 @@ public class CommandInstall {
     private static String getAdbFileForWin() {
         File file = new File("");
         String path = file.getAbsolutePath();
-        return path + "/windows/adb";
+        return path + "\\windows\\adb.exe";
     }
 
     private static String getAdbFileForMacOS() {
@@ -176,6 +178,12 @@ public class CommandInstall {
         File file = new File("");
         String path = file.getAbsolutePath();
         return path + "/apk/PhoneClient.apk";
+    }
+
+    private static String getApkForWin() {
+        File file = new File("");
+        String path = file.getAbsolutePath();
+        return path + "\\apk\\PhoneClient.apk";
     }
 
     public static void execExitAppProcessCommand() {
