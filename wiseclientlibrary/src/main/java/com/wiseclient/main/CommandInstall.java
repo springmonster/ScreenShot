@@ -16,14 +16,42 @@ public class CommandInstall {
     private static String ADB_PATH = getAdbFileForLinux();
     private static boolean isUnix = true;
 
-//    public static void main(String[] args) {
-//        installDex();
-//    }
+    public static void main(String[] args) {
+        installDex();
+    }
 
     public static void installDex() {
         checkPlatform();
+        execAdbPushCommand();
         execAdbForwardCommand();
         execAppProcessCommand();
+    }
+
+    private static void execAdbPushCommand() {
+        String apk = getApk();
+        System.out.println("-----> adb shell push command start <------");
+        try {
+            Process process;
+            if (isUnix) {
+                process = Runtime.getRuntime().exec("sh");
+            } else {
+                process = Runtime.getRuntime().exec("cmd /c ");
+            }
+
+            final BufferedWriter outputStream = new BufferedWriter(
+                    new OutputStreamWriter(process.getOutputStream()));
+
+            outputStream.write(ADB_PATH + " push " + apk + " /sdcard/PhoneClient.apk");
+            outputStream.write("\n");
+            outputStream.write("exit\n");
+            outputStream.flush();
+
+            process.waitFor();
+            readExecCommandResult(process.getInputStream());
+            System.out.println("-----> adb push forward command end <------");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static void checkPlatform() {
@@ -41,7 +69,7 @@ public class CommandInstall {
     }
 
     private static void execAdbForwardCommand() {
-        System.out.println("-----> adb forward command start <------");
+        System.out.println("-----> adb shell forward command start <------");
         try {
             Process process;
             if (isUnix) {
@@ -60,16 +88,21 @@ public class CommandInstall {
 
             process.waitFor();
             readExecCommandResult(process.getInputStream());
-            System.out.println("-----> adb forward command end <------");
+            System.out.println("-----> adb shell forward command end <------");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private static void execAppProcessCommand() {
-        String findApkCmd = "export CLASSPATH=/data/app/com.wise.wisescreenshot-1/base.apk";
+    public static void execAppProcessCommand() {
+//        String findApkCmd = "export CLASSPATH=/data/app/com.wise.wisescreenshot-1/base.apk";
+        String findApkCmd = "export CLASSPATH=/sdcard/PhoneClient.apk";
         String startApkCmd = "exec app_process /system/bin com.wise.wisescreenshot.PhoneClient";
-        String[] commands = new String[]{findApkCmd, startApkCmd};
+
+        String[] commands;
+
+        commands = new String[]{findApkCmd, startApkCmd};
+
         try {
             Process process;
             if (isUnix) {
@@ -137,5 +170,78 @@ public class CommandInstall {
         File file = new File("");
         String path = file.getAbsolutePath();
         return path + "/macos/adb";
+    }
+
+    private static String getApk() {
+        File file = new File("");
+        String path = file.getAbsolutePath();
+        return path + "/apk/PhoneClient.apk";
+    }
+
+    public static void execExitAppProcessCommand() {
+        String pid = findAppProcessPid();
+        if (pid != null) {
+            System.out.println("-----> adb shell kill command start <------");
+            try {
+                Process process;
+                if (isUnix) {
+                    process = Runtime.getRuntime().exec("sh");
+                } else {
+                    process = Runtime.getRuntime().exec("cmd /c ");
+                }
+
+                final BufferedWriter outputStream = new BufferedWriter(
+                        new OutputStreamWriter(process.getOutputStream()));
+
+                outputStream.write(ADB_PATH + " shell kill " + pid);
+                outputStream.write("\n");
+                outputStream.write("exit\n");
+                outputStream.flush();
+
+                System.out.println("-----> adb shell kill command end <------");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static String findAppProcessPid() {
+        String pid = null;
+        System.out.println("-----> adb shell ps command start <------");
+        try {
+            Process process;
+            if (isUnix) {
+                process = Runtime.getRuntime().exec("sh");
+            } else {
+                process = Runtime.getRuntime().exec("cmd /c ");
+            }
+
+            final BufferedWriter outputStream = new BufferedWriter(
+                    new OutputStreamWriter(process.getOutputStream()));
+
+            outputStream.write(ADB_PATH + " shell ps");
+            outputStream.write("\n");
+            outputStream.write("exit\n");
+            outputStream.flush();
+
+            String line;
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+                if (line.contains("app_process")) {
+                    String regex = "\\s+";
+                    line = line.replaceAll(regex, " ");
+                    pid = line.split(" ")[1];
+                    System.out.println("pid is " + pid);
+                    System.out.println("-----> adb shell ps command end <------");
+                    return pid;
+                }
+            }
+            return pid;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return pid;
+        }
     }
 }

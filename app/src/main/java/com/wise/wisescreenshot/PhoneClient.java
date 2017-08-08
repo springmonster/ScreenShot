@@ -4,18 +4,12 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.hardware.display.IDisplayManager;
-import android.hardware.input.InputManager;
 import android.net.LocalServerSocket;
 import android.net.LocalSocket;
 import android.os.Build;
 import android.os.IBinder;
-import android.os.SystemClock;
-import android.support.v4.view.InputDeviceCompat;
 import android.view.DisplayInfo;
 import android.view.IWindowManager;
-import android.view.InputEvent;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.Surface;
 
 import java.io.BufferedOutputStream;
@@ -40,19 +34,27 @@ public class PhoneClient {
     private static final String HOME = "HOME";
     private static final String BACK = "BACK";
 
-    private static InputManager im;
-    private static Method injectInputEventMethod;
-    private static long downTime;
+    private static final String KEY_UP = "KEY_UP";
+    private static final String KEY_DOWN = "KEY_DOWN";
+    private static final String KEY_LEFT = "KEY_LEFT";
+    private static final String KEY_RIGHT = "KEY_RIGHT";
+    private static final String KEY_ENTER = "KEY_ENTER";
+    private static final String KEY_ESC = "KEY_ESC";
+
     private static float scale = 0.5f;
     private static int rotation = 0;
     private static LocalServerSocket mLocalServerSocket;
 
     public static void main(String[] args) {
-        System.out.println("Phone client start");
+        startUnixSocket();
+    }
+
+    private static void startUnixSocket() {
+        System.out.println("start unix socket");
         try {
             startLocalServerSocket();
         } catch (Exception e) {
-            System.out.println("Phone client start error");
+            System.out.println("start unix socket error");
             System.out.println(e.getMessage());
         }
     }
@@ -60,24 +62,23 @@ public class PhoneClient {
     private static void startLocalServerSocket() throws IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         System.out.println("start local server socket");
         mLocalServerSocket = new LocalServerSocket("wisescreenshot");
-        init();
+        HandleInputEvent.init();
 
         while (true) {
-            System.out.println("listening...");
+            System.out.println("local server socket listening...");
             try {
                 LocalSocket localSocket = mLocalServerSocket.accept();
                 handleLocalSocket(localSocket);
             } catch (Exception e) {
+                System.out.println("local server socket listening error");
                 System.out.println(e.getMessage());
-                mLocalServerSocket = new LocalServerSocket("wisescreenshot");
+                try {
+                    mLocalServerSocket = new LocalServerSocket("wisescreenshot");
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
             }
         }
-    }
-
-    private static void init() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        im = (InputManager) InputManager.class.getDeclaredMethod("getInstance", new Class[0]).invoke(null);
-        MotionEvent.class.getDeclaredMethod("obtain").setAccessible(true);
-        injectInputEventMethod = InputManager.class.getMethod("injectInputEvent", InputEvent.class, Integer.TYPE);
     }
 
     private static void handleLocalSocket(LocalSocket localSocket) {
@@ -126,29 +127,10 @@ public class PhoneClient {
                 try {
                     BufferedReader reader = new BufferedReader(new InputStreamReader(localSocket.getInputStream()));
                     while (true) {
-                        String line;
                         try {
-                            line = reader.readLine();
-                            if (line == null) {
-                                return;
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            return;
-                        }
-                        try {
-                            if (line.startsWith(DOWN)) {
-                                handleDown(line.substring(DOWN.length()));
-                            } else if (line.startsWith(MOVE)) {
-                                handleMove(line.substring(MOVE.length()));
-                            } else if (line.startsWith(UP)) {
-                                handleUp(line.substring(UP.length()));
-                            } else if (line.startsWith(MENU)) {
-                                pressMenu();
-                            } else if (line.startsWith(HOME)) {
-                                pressHome();
-                            } else if (line.startsWith(BACK)) {
-                                pressBack();
+                            String line = reader.readLine();
+                            if (line != null) {
+                                handleKeyEvents(line);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -161,11 +143,37 @@ public class PhoneClient {
         }).start();
     }
 
+    private static void handleKeyEvents(String line) throws InvocationTargetException, IllegalAccessException {
+        if (line.startsWith(DOWN)) {
+            handleDown(line.substring(DOWN.length()));
+        } else if (line.startsWith(MOVE)) {
+            handleMove(line.substring(MOVE.length()));
+        } else if (line.startsWith(UP)) {
+            handleUp(line.substring(UP.length()));
+        } else if (line.startsWith(MENU)) {
+            HandleInputEvent.pressMenu();
+        } else if (line.startsWith(HOME)) {
+            HandleInputEvent.pressHome();
+        } else if (line.startsWith(BACK) || line.startsWith(KEY_ESC)) {
+            HandleInputEvent.pressBack();
+        } else if (line.startsWith(KEY_UP)) {
+            HandleInputEvent.pressUp();
+        } else if (line.startsWith(KEY_DOWN)) {
+            HandleInputEvent.pressDown();
+        } else if (line.startsWith(KEY_LEFT)) {
+            HandleInputEvent.pressLeft();
+        } else if (line.startsWith(KEY_RIGHT)) {
+            HandleInputEvent.pressRight();
+        } else if (line.startsWith(KEY_ENTER)) {
+            HandleInputEvent.pressEnter();
+        }
+    }
+
     private static void handleUp(String line) {
         Point point = getXY(line);
         if (point != null) {
             try {
-                touchUp(point.x, point.y);
+                HandleInputEvent.touchUp(point.x, point.y);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -176,7 +184,7 @@ public class PhoneClient {
         Point point = getXY(line);
         if (point != null) {
             try {
-                touchMove(point.x, point.y);
+                HandleInputEvent.touchMove(point.x, point.y);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -187,7 +195,7 @@ public class PhoneClient {
         Point point = getXY(line);
         if (point != null) {
             try {
-                touchDown(point.x, point.y);
+                HandleInputEvent.touchDown(point.x, point.y);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -205,48 +213,6 @@ public class PhoneClient {
             e.printStackTrace();
         }
         return null;
-    }
-
-    private static void pressMenu() throws InvocationTargetException, IllegalAccessException {
-        sendKeyEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_KEYBOARD, KeyEvent.KEYCODE_MENU, false);
-    }
-
-    private static void pressHome() throws InvocationTargetException, IllegalAccessException {
-        sendKeyEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_KEYBOARD, KeyEvent.KEYCODE_HOME, false);
-    }
-
-    private static void pressBack() throws InvocationTargetException, IllegalAccessException {
-        sendKeyEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_KEYBOARD, KeyEvent.KEYCODE_BACK, false);
-    }
-
-    private static void touchDown(float clientX, float clientY) throws InvocationTargetException, IllegalAccessException {
-        downTime = SystemClock.uptimeMillis();
-        injectMotionEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_TOUCHSCREEN, MotionEvent.ACTION_DOWN, downTime, downTime, clientX, clientY, 1.0f);
-    }
-
-    private static void touchUp(float clientX, float clientY) throws InvocationTargetException, IllegalAccessException {
-        injectMotionEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_TOUCHSCREEN, MotionEvent.ACTION_UP, downTime, SystemClock.uptimeMillis(), clientX, clientY, 1.0f);
-    }
-
-    private static void touchMove(float clientX, float clientY) throws InvocationTargetException, IllegalAccessException {
-        injectMotionEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_TOUCHSCREEN, MotionEvent.ACTION_MOVE, downTime, SystemClock.uptimeMillis(), clientX, clientY, 1.0f);
-    }
-
-    private static void injectMotionEvent(InputManager im, Method injectInputEventMethod, int inputSource, int action, long downTime, long eventTime, float x, float y, float pressure) throws InvocationTargetException, IllegalAccessException {
-        MotionEvent event = MotionEvent.obtain(downTime, eventTime, action, x, y, pressure, 1.0f, 0, 1.0f, 1.0f, 0, 0);
-        event.setSource(inputSource);
-        injectInputEventMethod.invoke(im, event, Integer.valueOf(0));
-    }
-
-    private static void injectKeyEvent(InputManager im, Method injectInputEventMethod, KeyEvent event) throws InvocationTargetException, IllegalAccessException {
-        injectInputEventMethod.invoke(im, event, Integer.valueOf(0));
-    }
-
-    private static void sendKeyEvent(InputManager im, Method injectInputEventMethod, int inputSource, int keyCode, boolean shift) throws InvocationTargetException, IllegalAccessException {
-        long now = SystemClock.uptimeMillis();
-        int meta = shift ? 1 : 0;
-        injectKeyEvent(im, injectInputEventMethod, new KeyEvent(now, now, 0, keyCode, 0, meta, -1, 0, 0, inputSource));
-        injectKeyEvent(im, injectInputEventMethod, new KeyEvent(now, now, 1, keyCode, 0, meta, -1, 0, 0, inputSource));
     }
 
     /**

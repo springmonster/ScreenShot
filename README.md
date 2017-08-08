@@ -55,9 +55,12 @@ export CLASSPATH=/sdcard/HelloWorld.dex
 exec app_process /system/bin com.wise.main.HelloWorld
 ```
 
-LocalSocketServer
+LocalServerSocket
 ------------------------
+[Unix Domain Socket](https://en.wikipedia.org/wiki/Unix_domain_socket)
+
+[LocalServerSocket](https://developer.android.com/reference/android/net/LocalServerSocket.html)
+
 WiseScreenShot
 ------------------------
-* 编译app工程并将apk安装到手机上
 * 运行wiseclientlibrary中的ComputerClientFrame，点击“连接手机”按钮
