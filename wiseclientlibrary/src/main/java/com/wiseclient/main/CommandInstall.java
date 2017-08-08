@@ -179,7 +179,6 @@ public class CommandInstall {
         String path = file.getAbsolutePath();
         return path + "/apk/PhoneClient.apk";
     }
-
     private static String getApkForWin() {
         File file = new File("");
         String path = file.getAbsolutePath();
@@ -195,7 +194,7 @@ public class CommandInstall {
                 if (isUnix) {
                     process = Runtime.getRuntime().exec("sh");
                 } else {
-                    process = Runtime.getRuntime().exec("cmd /c ");
+                    process = Runtime.getRuntime().exec("cmd");
                 }
 
                 final BufferedWriter outputStream = new BufferedWriter(
@@ -221,7 +220,7 @@ public class CommandInstall {
             if (isUnix) {
                 process = Runtime.getRuntime().exec("sh");
             } else {
-                process = Runtime.getRuntime().exec("cmd /c ");
+                process = Runtime.getRuntime().exec("cmd");
             }
 
             final BufferedWriter outputStream = new BufferedWriter(
