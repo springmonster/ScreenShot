@@ -30,6 +30,9 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -63,6 +66,9 @@ public class ComputerClientFrame extends JFrame {
     private int mMoveNewX;
     private int mMoveNewY;
 
+    private boolean isScriptShow = false;
+    private boolean isGVertical = true;
+
     public ComputerClientFrame() throws IOException {
         createComputerClientFrame();
 
@@ -78,6 +84,8 @@ public class ComputerClientFrame extends JFrame {
 
         createScriptPanel();
 
+        setScriptViewsVisible(false);
+
         this.add(mMainPanel);
 
         mUserActionInterface = new UserAction(mJTextAreaShowScript);
@@ -86,7 +94,27 @@ public class ComputerClientFrame extends JFrame {
         mainPanelRequestFocus();
     }
 
+    private void setScriptViewsVisible(boolean b) {
+        if (isGVertical) {
+            if (b) {
+                this.setBounds(360, 20, 1000, 1000);
+            } else {
+                this.setBounds(360, 20, 500, 1000);
+            }
+        } else {
+            if (b) {
+                this.setBounds(360, 20, 1000, 1000);
+            } else {
+                this.setBounds(360, 20, 1000, 500);
+            }
+        }
+        isScriptShow = b;
+        mMainPanel.updateUI();
+    }
+
     private void createComputerClientFrame() {
+        createJMenu();
+
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setBounds(360, 20, 1000, 1000);
         this.setTitle("屏幕共享");
@@ -97,6 +125,29 @@ public class ComputerClientFrame extends JFrame {
                 System.out.println("window closing");
                 CommandInstall.execExitAppProcessCommand();
                 super.windowClosing(e);
+            }
+        });
+    }
+
+    private void createJMenu() {
+        JMenuBar jMenuBar = new JMenuBar();
+        final JMenu jMenu = new JMenu("脚本");
+        final JMenuItem jMenuItem = new JMenuItem("显示");
+        this.setJMenuBar(jMenuBar);
+        jMenuBar.add(jMenu);
+        jMenu.add(jMenuItem);
+        jMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (mJScrollPane != null) {
+                    if (jMenuItem.getText().equals("显示")) {
+                        jMenuItem.setText("隐藏");
+                        setScriptViewsVisible(true);
+                    } else if (jMenuItem.getText().equals("隐藏")) {
+                        jMenuItem.setText("显示");
+                        setScriptViewsVisible(false);
+                    }
+                }
             }
         });
     }
@@ -312,6 +363,8 @@ public class ComputerClientFrame extends JFrame {
     }
 
     private void changeDisplayOrientation(boolean isVertical) {
+        isGVertical = isVertical;
+
         if (isVertical) {
             System.out.println("screen change to vertical");
             mConnectBtn.setBounds(0, 0, 510, 20);
@@ -322,6 +375,12 @@ public class ComputerClientFrame extends JFrame {
 
             mJButtonSaveFile.setBounds(510, 0, 490, 20);
             mJScrollPane.setBounds(510, 20, 490, 960);
+
+            if (isScriptShow) {
+                this.setBounds(360, 20, 1000, 1000);
+            } else {
+                this.setBounds(360, 20, 500, 1000);
+            }
         } else {
             System.out.println("screen change to landscape");
             mConnectBtn.setBounds(0, 0, 1000, 20);
@@ -332,6 +391,12 @@ public class ComputerClientFrame extends JFrame {
 
             mJButtonSaveFile.setBounds(0, 510, 1000, 20);
             mJScrollPane.setBounds(0, 530, 1000, 450);
+
+            if (isScriptShow) {
+                this.setBounds(360, 20, 1000, 1000);
+            } else {
+                this.setBounds(360, 20, 1000, 500);
+            }
         }
         mMainPanel.validate();
         mMainPanel.repaint();
