@@ -5,7 +5,9 @@ import com.wiseclient.script.UserAction;
 import com.wiseclient.script.UserActionInterface;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -26,7 +28,6 @@ import java.net.Socket;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -42,11 +43,13 @@ import javax.swing.JTextArea;
  */
 
 public class ComputerClientFrame extends JFrame {
+    Dimension mScreenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    private int mFrameHeight = (int) (mScreenSize.getHeight() * 9 / 10);
+    private int mFrameWidth = (int) (mScreenSize.getHeight() * 9 / 10);
+    private JMenuBar mJMenuBar;
     private JLabel mImageLabel;
     private JPanel mMainPanel;
-    private JButton mJButtonSaveFile;
     private JTextArea mJTextAreaShowScript;
-    private JButton mConnectBtn;
     private JScrollPane mJScrollPane;
     private JLabel mJLabelBottomMenu;
     private JLabel mJLabelBottomHome;
@@ -74,13 +77,9 @@ public class ComputerClientFrame extends JFrame {
 
         createMainPanel();
 
-        createConnectBtn();
-
         createImageLabel();
 
         createBottomBar();
-
-        createSaveButton();
 
         createScriptPanel();
 
@@ -94,21 +93,21 @@ public class ComputerClientFrame extends JFrame {
         mainPanelRequestFocus();
     }
 
-    private void setScriptViewsVisible(boolean b) {
+    private void setScriptViewsVisible(boolean scriptViewsVisible) {
         if (isGVertical) {
-            if (b) {
-                this.setBounds(360, 20, 1000, 1000);
+            if (scriptViewsVisible) {
+                this.setBounds(450, 0, mFrameWidth, mFrameHeight);
             } else {
-                this.setBounds(360, 20, 500, 1000);
+                this.setBounds(450, 0, mFrameWidth / 2, mFrameHeight);
             }
         } else {
-            if (b) {
-                this.setBounds(360, 20, 1000, 1000);
+            if (scriptViewsVisible) {
+                this.setBounds(450, 0, mFrameWidth, mFrameHeight);
             } else {
-                this.setBounds(360, 20, 1000, 500);
+                this.setBounds(450, 0, mFrameWidth, mFrameHeight / 2);
             }
         }
-        isScriptShow = b;
+        isScriptShow = scriptViewsVisible;
         mMainPanel.updateUI();
     }
 
@@ -116,7 +115,7 @@ public class ComputerClientFrame extends JFrame {
         createJMenu();
 
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setBounds(360, 20, 1000, 1000);
+        this.setBounds(450, 0, mFrameWidth, mFrameHeight);
         this.setTitle("屏幕共享");
         this.setResizable(false);
         this.addWindowListener(new WindowAdapter() {
@@ -130,64 +129,27 @@ public class ComputerClientFrame extends JFrame {
     }
 
     private void createJMenu() {
-        JMenuBar jMenuBar = new JMenuBar();
-        final JMenu jMenu = new JMenu("脚本");
-        final JMenuItem jMenuItem = new JMenuItem("显示");
-        this.setJMenuBar(jMenuBar);
-        jMenuBar.add(jMenu);
-        jMenu.add(jMenuItem);
-        jMenuItem.addActionListener(new ActionListener() {
+        mJMenuBar = new JMenuBar();
+
+        final JMenu phoneJMenu = new JMenu("手机");
+        final JMenuItem connectJMenuItem = new JMenuItem("连接手机");
+
+        final JMenu scriptJMenu = new JMenu("脚本");
+        final JMenuItem disJMenuItem = new JMenuItem("显示脚本");
+        final JMenuItem saveJMenuItem = new JMenuItem("保存脚本");
+
+        this.setJMenuBar(mJMenuBar);
+        mJMenuBar.add(phoneJMenu);
+        mJMenuBar.add(scriptJMenu);
+
+        phoneJMenu.add(connectJMenuItem);
+
+        scriptJMenu.add(disJMenuItem);
+        scriptJMenu.add(saveJMenuItem);
+
+        connectJMenuItem.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                if (mJScrollPane != null) {
-                    if (jMenuItem.getText().equals("显示")) {
-                        jMenuItem.setText("隐藏");
-                        setScriptViewsVisible(true);
-                    } else if (jMenuItem.getText().equals("隐藏")) {
-                        jMenuItem.setText("显示");
-                        setScriptViewsVisible(false);
-                    }
-                }
-            }
-        });
-    }
-
-    private void createScriptPanel() {
-        mJTextAreaShowScript = new JTextArea();
-        mJTextAreaShowScript.setBounds(510, 20, 490, 960);
-        mJTextAreaShowScript.setLineWrap(true);
-        mJTextAreaShowScript.setWrapStyleWord(true);
-
-        mJScrollPane = new JScrollPane(mJTextAreaShowScript);
-        mJScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        mJScrollPane.setBounds(510, 20, 490, 960);
-
-        mMainPanel.add(mJScrollPane);
-    }
-
-    private void createMainPanel() {
-        mMainPanel = new JPanel();
-        mMainPanel.setBounds(0, 0, 1000, 1000);
-        mMainPanel.setLayout(null);
-        mMainPanel.setBackground(new Color(220, 240, 250));
-    }
-
-    private void createImageLabel() {
-        mImageLabel = new JLabel();
-        mImageLabel.setBackground(Color.BLACK);
-        mImageLabel.setOpaque(true);
-        mImageLabel.setBounds(0, 20, 510, 920);
-        mImageLabel.addMouseListener(new LabelMouseClickListener());
-        mImageLabel.addMouseMotionListener(new LabelMouseMotionListener());
-        mMainPanel.add(mImageLabel);
-    }
-
-    private void createConnectBtn() {
-        mConnectBtn = new JButton("连接手机");
-        mConnectBtn.setBounds(0, 0, 510, 20);
-        mConnectBtn.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 try {
                     startSocket("127.0.0.1", "9999");
                 } catch (IOException e1) {
@@ -195,14 +157,23 @@ public class ComputerClientFrame extends JFrame {
                 }
             }
         });
-        mMainPanel.add(mConnectBtn);
-    }
 
-    private void createSaveButton() {
-        mJButtonSaveFile = new JButton();
-        mJButtonSaveFile.setText("保存脚本");
-        mJButtonSaveFile.setBounds(510, 0, 490, 20);
-        mJButtonSaveFile.addActionListener(new ActionListener() {
+        disJMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (mJScrollPane != null) {
+                    if (disJMenuItem.getText().equals("显示脚本")) {
+                        disJMenuItem.setText("隐藏脚本");
+                        setScriptViewsVisible(true);
+                    } else if (disJMenuItem.getText().equals("隐藏脚本")) {
+                        disJMenuItem.setText("显示脚本");
+                        setScriptViewsVisible(false);
+                    }
+                }
+            }
+        });
+
+        saveJMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fileChooser = new JFileChooser();
@@ -215,7 +186,36 @@ public class ComputerClientFrame extends JFrame {
                 }
             }
         });
-        mMainPanel.add(mJButtonSaveFile);
+    }
+
+    private void createScriptPanel() {
+        mJTextAreaShowScript = new JTextArea();
+        mJTextAreaShowScript.setBounds(mFrameWidth / 2, 0, mFrameWidth / 2, mFrameHeight);
+        mJTextAreaShowScript.setLineWrap(true);
+        mJTextAreaShowScript.setWrapStyleWord(true);
+
+        mJScrollPane = new JScrollPane(mJTextAreaShowScript);
+        mJScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        mJScrollPane.setBounds(mFrameWidth / 2, 0, mFrameWidth / 2, mFrameHeight);
+
+        mMainPanel.add(mJScrollPane);
+    }
+
+    private void createMainPanel() {
+        mMainPanel = new JPanel();
+        mMainPanel.setBounds(0, 0, mFrameWidth, mFrameHeight);
+        mMainPanel.setLayout(null);
+        mMainPanel.setBackground(new Color(220, 240, 250));
+    }
+
+    private void createImageLabel() {
+        mImageLabel = new JLabel();
+        mImageLabel.setBackground(Color.BLACK);
+        mImageLabel.setOpaque(true);
+        mImageLabel.setBounds(0, 0, mFrameWidth / 2, mFrameHeight - 80);
+        mImageLabel.addMouseListener(new LabelMouseClickListener());
+        mImageLabel.addMouseMotionListener(new LabelMouseMotionListener());
+        mMainPanel.add(mImageLabel);
     }
 
     private int calcXInDisplay(int input) {
@@ -241,17 +241,17 @@ public class ComputerClientFrame extends JFrame {
         mJLabelBottomMenu = new JLabel(menuImageIcon);
         mJLabelBottomMenu.setBackground(Color.BLACK);
         mJLabelBottomMenu.setOpaque(true);
-        mJLabelBottomMenu.setBounds(0, 940, 170, 40);
+        mJLabelBottomMenu.setBounds(0, mImageLabel.getHeight(), mFrameWidth / 6, 40);
 
         mJLabelBottomHome = new JLabel(homeImageIcon);
         mJLabelBottomHome.setBackground(Color.BLACK);
         mJLabelBottomHome.setOpaque(true);
-        mJLabelBottomHome.setBounds(170, 940, 170, 40);
+        mJLabelBottomHome.setBounds(mFrameWidth / 6, mImageLabel.getHeight(), mFrameWidth / 6, 40);
 
         mJLabelBottomBack = new JLabel(backImageIcon);
         mJLabelBottomBack.setBackground(Color.BLACK);
         mJLabelBottomBack.setOpaque(true);
-        mJLabelBottomBack.setBounds(340, 940, 170, 40);
+        mJLabelBottomBack.setBounds(mFrameWidth / 6 * 2, mImageLabel.getHeight(), mFrameWidth / 6, 40);
 
         mMainPanel.add(mJLabelBottomMenu);
         mMainPanel.add(mJLabelBottomHome);
@@ -367,35 +367,31 @@ public class ComputerClientFrame extends JFrame {
 
         if (isVertical) {
             System.out.println("screen change to vertical");
-            mConnectBtn.setBounds(0, 0, 510, 20);
-            mImageLabel.setBounds(0, 20, 510, 920);
-            mJLabelBottomMenu.setBounds(0, 940, 170, 40);
-            mJLabelBottomHome.setBounds(170, 940, 170, 40);
-            mJLabelBottomBack.setBounds(340, 940, 170, 40);
+            mImageLabel.setBounds(0, 0, mFrameWidth / 2, mFrameHeight - 80);
+            mJLabelBottomMenu.setBounds(0, mImageLabel.getHeight(), mFrameWidth / 6, 40);
+            mJLabelBottomHome.setBounds(mFrameWidth / 6, mImageLabel.getHeight(), mFrameWidth / 6, 40);
+            mJLabelBottomBack.setBounds(mFrameWidth / 6 * 2, mImageLabel.getHeight(), mFrameWidth / 6, 40);
 
-            mJButtonSaveFile.setBounds(510, 0, 490, 20);
-            mJScrollPane.setBounds(510, 20, 490, 960);
+            mJScrollPane.setBounds(mFrameWidth / 2, 0, mFrameWidth / 2, mFrameHeight);
 
             if (isScriptShow) {
-                this.setBounds(360, 20, 1000, 1000);
+                this.setBounds(450, 0, mFrameWidth, mFrameHeight);
             } else {
-                this.setBounds(360, 20, 500, 1000);
+                this.setBounds(450, 0, mFrameWidth / 2, mFrameHeight);
             }
         } else {
             System.out.println("screen change to landscape");
-            mConnectBtn.setBounds(0, 0, 1000, 20);
-            mImageLabel.setBounds(0, 20, 1000, 450);
-            mJLabelBottomMenu.setBounds(0, 470, 333, 40);
-            mJLabelBottomHome.setBounds(333, 470, 333, 40);
-            mJLabelBottomBack.setBounds(666, 470, 334, 40);
+            mImageLabel.setBounds(0, 0, mFrameWidth, mFrameHeight / 2 - 40);
+            mJLabelBottomMenu.setBounds(0, mImageLabel.getHeight(), mFrameWidth / 3, 40);
+            mJLabelBottomHome.setBounds(mFrameWidth / 3, mImageLabel.getHeight(), mFrameWidth / 3, 40);
+            mJLabelBottomBack.setBounds(mFrameWidth / 3 * 2, mImageLabel.getHeight(), mFrameWidth / 3, 40);
 
-            mJButtonSaveFile.setBounds(0, 510, 1000, 20);
-            mJScrollPane.setBounds(0, 530, 1000, 450);
+            mJScrollPane.setBounds(0, mFrameHeight / 2, mFrameWidth, mFrameHeight / 2);
 
             if (isScriptShow) {
-                this.setBounds(360, 20, 1000, 1000);
+                this.setBounds(450, 0, mFrameWidth, mFrameHeight);
             } else {
-                this.setBounds(360, 20, 1000, 500);
+                this.setBounds(450, 0, mFrameWidth, mFrameHeight / 2);
             }
         }
         mMainPanel.validate();
