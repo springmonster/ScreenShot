@@ -247,6 +247,7 @@ public class PhoneClient {
             }
             return Bitmap.createBitmap(bitmap, 0, 0, size.x, size.y, m, false);
         } catch (Exception e) {
+            System.out.println("screen shot error");
             System.out.println(e.getMessage());
             return null;
         }

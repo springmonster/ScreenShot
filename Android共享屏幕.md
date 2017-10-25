@@ -56,3 +56,4 @@ exec app_process /system/bin com.wise.main.HelloWorld
 * adb push PhoneClient.dex /sdcard
 * 运行CommandInstall.java
 * 运行ComputerClientFrame.java
+* 如果使用鼠标进行点击操作，打开开发者选项里面的“模拟点击”
