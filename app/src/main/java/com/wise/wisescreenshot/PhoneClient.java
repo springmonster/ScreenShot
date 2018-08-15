@@ -59,7 +59,7 @@ public class PhoneClient {
         }
     }
 
-    private static void startLocalServerSocket() throws IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    private static void startLocalServerSocket() throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         System.out.println("start local server socket");
         mLocalServerSocket = new LocalServerSocket("wisescreenshot");
         HandleInputEvent.init();
@@ -220,7 +220,7 @@ public class PhoneClient {
      *
      * @throws Exception
      */
-    private static Bitmap screenshot() throws Exception {
+    private static Bitmap screenshot() {
         try {
             String surfaceClassName;
             Point size = getCurrentDisplaySize();
@@ -264,7 +264,11 @@ public class PhoneClient {
             if (Build.VERSION.SDK_INT >= 18) {
                 wm = IWindowManager.Stub.asInterface((IBinder) getServiceMethod.invoke(null, "window"));
                 wm.getInitialDisplaySize(0, point);
-                rotation = wm.getRotation();
+                if (Build.VERSION.SDK_INT < 26) {
+                    rotation = wm.getRotation();
+                } else {
+                    rotation = wm.getDefaultDisplayRotation();
+                }
             } else if (Build.VERSION.SDK_INT == 17) {
                 DisplayInfo di = IDisplayManager.Stub.asInterface((IBinder) getServiceMethod.invoke(null, "display")).getDisplayInfo(0);
                 point.x = ((Integer) DisplayInfo.class.getDeclaredField("logicalWidth").get(di)).intValue();

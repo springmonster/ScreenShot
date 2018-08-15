@@ -12,12 +12,14 @@ public interface IWindowManager {
 
     int getRotation();
 
+    int getDefaultDisplayRotation();
+
     void getRealDisplaySize(Point displaySize);
 
     abstract class Stub {
 
-         public static IWindowManager asInterface(IBinder invoke) {
-             return null;
-         }
-     }
+        public static IWindowManager asInterface(IBinder invoke) {
+            return null;
+        }
+    }
 }

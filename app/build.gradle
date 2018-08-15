@@ -23,12 +23,15 @@ android {
     }
 }
 
-task copyPhoneClientApk(type: Copy) {
-    copy {
-        from file("${buildDir}/outputs/apk/debug/PhoneClient.apk")
-        into file("${rootDir}/apk")
-    }
+task deletePhoneClientApk(type: Delete) {
+    delete "${rootDir}/apk/PhoneClient.apk"
 }
+
+task copyPhoneClientApk(type: Copy) {
+    from file("${buildDir}/outputs/apk/debug/PhoneClient.apk")
+    into file("${rootDir}/apk")
+}
+copyPhoneClientApk.dependsOn deletePhoneClientApk
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
