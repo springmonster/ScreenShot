@@ -19,7 +19,6 @@ android {
     applicationVariants.all { variant ->
         variant.outputs.all {
             outputFileName = "PhoneClient.apk"
-            copyPhoneClientApk.dependsOn variant.assemble
         }
     }
 }
