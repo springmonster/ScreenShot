@@ -116,7 +116,7 @@ public class ComputerClientFrame extends JFrame {
 
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setBounds(450, 0, mFrameWidth, mFrameHeight);
-        this.setTitle("屏幕共享");
+        this.setTitle("Screen Share");
         this.setResizable(false);
         this.addWindowListener(new WindowAdapter() {
             @Override
@@ -131,12 +131,12 @@ public class ComputerClientFrame extends JFrame {
     private void createJMenu() {
         mJMenuBar = new JMenuBar();
 
-        final JMenu phoneJMenu = new JMenu("手机");
-        final JMenuItem connectJMenuItem = new JMenuItem("连接手机");
+        final JMenu phoneJMenu = new JMenu("Phone");
+        final JMenuItem connectJMenuItem = new JMenuItem("Connect phone");
 
-        final JMenu scriptJMenu = new JMenu("脚本");
-        final JMenuItem disJMenuItem = new JMenuItem("显示脚本");
-        final JMenuItem saveJMenuItem = new JMenuItem("保存脚本");
+        final JMenu scriptJMenu = new JMenu("Script");
+        final JMenuItem disJMenuItem = new JMenuItem("Show script");
+        final JMenuItem saveJMenuItem = new JMenuItem("Save script");
 
         this.setJMenuBar(mJMenuBar);
         mJMenuBar.add(phoneJMenu);
@@ -162,11 +162,11 @@ public class ComputerClientFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 if (mJScrollPane != null) {
-                    if (disJMenuItem.getText().equals("显示脚本")) {
-                        disJMenuItem.setText("隐藏脚本");
+                    if (disJMenuItem.getText().equals("Show script")) {
+                        disJMenuItem.setText("Hide script");
                         setScriptViewsVisible(true);
-                    } else if (disJMenuItem.getText().equals("隐藏脚本")) {
-                        disJMenuItem.setText("显示脚本");
+                    } else if (disJMenuItem.getText().equals("Hide script")) {
+                        disJMenuItem.setText("Show script");
                         setScriptViewsVisible(false);
                     }
                 }
@@ -307,7 +307,7 @@ public class ComputerClientFrame extends JFrame {
         });
     }
 
-    private void startSocket(final String ip, final String port) throws IOException {
+    private void startSocket(final String ip, final String port) {
         new Thread() {
             @Override
             public void run() {

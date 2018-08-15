@@ -9,7 +9,7 @@ import javax.swing.JTextArea;
 public class DisplayScript implements ScriptInterface {
     private JTextArea mJTextArea;
 
-    public DisplayScript(JTextArea jTextArea) {
+    DisplayScript(JTextArea jTextArea) {
         this.mJTextArea = jTextArea;
     }
 

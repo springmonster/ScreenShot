@@ -4,7 +4,6 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
 
 import javax.swing.Icon;
 
@@ -14,10 +13,9 @@ import javax.swing.Icon;
 
 public class ScaleIcon implements Icon {
 
-    private BufferedImage i = null;
-    private Icon icon = null;
+    private Icon icon;
 
-    public ScaleIcon(Icon icon) {
+    ScaleIcon(Icon icon) {
         this.icon = icon;
     }
 
