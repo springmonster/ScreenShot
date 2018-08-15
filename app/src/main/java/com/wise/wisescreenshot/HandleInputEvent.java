@@ -19,7 +19,7 @@ public class HandleInputEvent {
     private static Method injectInputEventMethod;
     private static long downTime;
 
-    public static void init() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public static void init() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         im = (InputManager) InputManager.class.getDeclaredMethod("getInstance", new Class[0]).invoke(null);
         MotionEvent.class.getDeclaredMethod("obtain").setAccessible(true);
         injectInputEventMethod = InputManager.class.getMethod("injectInputEvent", InputEvent.class, Integer.TYPE);

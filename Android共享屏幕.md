@@ -53,7 +53,10 @@ exec app_process /system/bin com.wise.main.HelloWorld
 ##LocalSocketServer
 
 ##WiseScreenShot
-* adb push PhoneClient.dex /sdcard
-* 运行CommandInstall.java
 * 运行ComputerClientFrame.java
+* 点击Phone -> Prepare
+* 点击Phone -> Connect Phone
 * 如果使用鼠标进行点击操作，打开开发者选项里面的“模拟点击”
+
+##问题
+* 目前手中的Android 8.0系统手机没有生效

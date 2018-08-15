@@ -8,8 +8,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -72,7 +70,7 @@ public class ComputerClientFrame extends JFrame {
     private boolean isScriptShow = false;
     private boolean isGVertical = true;
 
-    public ComputerClientFrame() throws IOException {
+    ComputerClientFrame() throws IOException {
         createComputerClientFrame();
 
         createMainPanel();
@@ -132,6 +130,7 @@ public class ComputerClientFrame extends JFrame {
         mJMenuBar = new JMenuBar();
 
         final JMenu phoneJMenu = new JMenu("Phone");
+        final JMenuItem prepareJMenuItem = new JMenuItem("Prepare");
         final JMenuItem connectJMenuItem = new JMenuItem("Connect phone");
 
         final JMenu scriptJMenu = new JMenu("Script");
@@ -142,44 +141,37 @@ public class ComputerClientFrame extends JFrame {
         mJMenuBar.add(phoneJMenu);
         mJMenuBar.add(scriptJMenu);
 
+        phoneJMenu.add(prepareJMenuItem);
         phoneJMenu.add(connectJMenuItem);
 
         scriptJMenu.add(disJMenuItem);
         scriptJMenu.add(saveJMenuItem);
 
-        connectJMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                startSocket("127.0.0.1", "9999");
-            }
-        });
+        prepareJMenuItem.addActionListener(e -> new Thread(() -> {
+            CommandInstall.installDex();
+        }).start());
+        connectJMenuItem.addActionListener(e -> startSocket("127.0.0.1", "3000"));
 
-        disJMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                if (mJScrollPane != null) {
-                    if (disJMenuItem.getText().equals("Show script")) {
-                        disJMenuItem.setText("Hide script");
-                        setScriptViewsVisible(true);
-                    } else if (disJMenuItem.getText().equals("Hide script")) {
-                        disJMenuItem.setText("Show script");
-                        setScriptViewsVisible(false);
-                    }
+        disJMenuItem.addActionListener(actionEvent -> {
+            if (mJScrollPane != null) {
+                if (disJMenuItem.getText().equals("Show script")) {
+                    disJMenuItem.setText("Hide script");
+                    setScriptViewsVisible(true);
+                } else if (disJMenuItem.getText().equals("Hide script")) {
+                    disJMenuItem.setText("Show script");
+                    setScriptViewsVisible(false);
                 }
             }
         });
 
-        saveJMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser fileChooser = new JFileChooser();
-                int result = fileChooser.showSaveDialog(null);
-                if (JFileChooser.APPROVE_OPTION == result) {
-                    File file = fileChooser.getSelectedFile();
-                    System.out.println(file.getAbsolutePath());
-                    String scriptContent = mJTextAreaShowScript.getText();
-                    SaveScript.saveFile(file, scriptContent);
-                }
+        saveJMenuItem.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            int result = fileChooser.showSaveDialog(null);
+            if (JFileChooser.APPROVE_OPTION == result) {
+                File file = fileChooser.getSelectedFile();
+                System.out.println(file.getAbsolutePath());
+                String scriptContent = mJTextAreaShowScript.getText();
+                SaveScript.saveFile(file, scriptContent);
             }
         });
     }
@@ -392,13 +384,6 @@ public class ComputerClientFrame extends JFrame {
     }
 
     public static void main(String[] args) throws IOException {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                CommandInstall.installDex();
-            }
-        }).start();
-
         new ComputerClientFrame().setVisible(true);
     }
 

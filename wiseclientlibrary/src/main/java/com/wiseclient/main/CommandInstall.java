@@ -28,7 +28,7 @@ public class CommandInstall {
     }
 
     private static void execAdbPushCommand() {
-        String apk = null;
+        String apk;
         System.out.println("-----> adb shell push command start <------ ");
         try {
             Process process;
@@ -83,7 +83,7 @@ public class CommandInstall {
             final BufferedWriter outputStream = new BufferedWriter(
                     new OutputStreamWriter(process.getOutputStream()));
 
-            outputStream.write(ADB_PATH + " forward tcp:9999 localabstract:wisescreenshot");
+            outputStream.write(ADB_PATH + " forward tcp:3000 localabstract:wisescreenshot");
             outputStream.write("\n");
             outputStream.write("exit\n");
             outputStream.flush();
@@ -99,7 +99,7 @@ public class CommandInstall {
     public static void execAppProcessCommand() {
 //        String findApkCmd = "export CLASSPATH=/data/app/com.wise.wisescreenshot-1/base.apk";
         String findApkCmd = "export CLASSPATH=/sdcard/PhoneClient.apk";
-        String startApkCmd = "exec app_process /system/bin com.wise.wisescreenshot.PhoneClient";
+        String startApkCmd = "exec app_process /sdcard com.wise.wisescreenshot.PhoneClient";
 
         String[] commands;
 
@@ -179,6 +179,7 @@ public class CommandInstall {
         String path = file.getAbsolutePath();
         return path + "/apk/PhoneClient.apk";
     }
+
     private static String getApkForWin() {
         File file = new File("");
         String path = file.getAbsolutePath();
