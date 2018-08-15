@@ -150,11 +150,7 @@ public class ComputerClientFrame extends JFrame {
         connectJMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    startSocket("127.0.0.1", "9999");
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
+                startSocket("127.0.0.1", "9999");
             }
         });
 
@@ -322,17 +318,14 @@ public class ComputerClientFrame extends JFrame {
                         mDisplayX = dataInputStream.readInt();
                         mDisplayY = dataInputStream.readInt();
                         if (mDisplayOldX != mDisplayX && mDisplayOldY != mDisplayY) {
-                            // 如果为机顶盒的应用，则mDisplayX是大于mDisplayY的，需要改变成为横屏状态
                             if (mDisplayOldX == 0 && mDisplayOldY == 0) {
                                 if (mDisplayX > mDisplayY) {
                                     changeDisplayOrientation(false);
                                 }
                             }
                             if (mDisplayOldX < mDisplayOldY && mDisplayX > mDisplayY) {
-                                //此时由竖屏状态改变为横屏状态
                                 changeDisplayOrientation(false);
                             } else if (mDisplayOldX > mDisplayOldY && mDisplayX < mDisplayY) {
-                                //此时由横屏状态改变为竖屏状态
                                 changeDisplayOrientation(true);
                             }
                             mDisplayOldX = mDisplayX;

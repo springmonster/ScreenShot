@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
     defaultConfig {
         applicationId "com.wise.wisescreenshot"
         minSdkVersion 16
-        targetSdkVersion 21
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
     }
@@ -17,15 +17,22 @@ android {
         }
     }
     applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-            output.outputFile = new File(project.rootProject.projectDir.absolutePath + "/apk",
-                    "PhoneClient.apk")
+        variant.outputs.all {
+            outputFileName = "PhoneClient.apk"
+            copyPhoneClientApk.dependsOn variant.assemble
         }
     }
 }
 
+task copyPhoneClientApk(type: Copy) {
+    copy {
+        from file("${buildDir}/outputs/apk/debug/PhoneClient.apk")
+        into file("${rootDir}/apk")
+    }
+}
+
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:25.0.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 }
