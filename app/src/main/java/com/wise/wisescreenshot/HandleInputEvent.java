@@ -2,13 +2,14 @@ package com.wise.wisescreenshot;
 
 import android.hardware.input.InputManager;
 import android.os.SystemClock;
-import android.support.v4.view.InputDeviceCompat;
 import android.view.InputEvent;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import androidx.core.view.InputDeviceCompat;
 
 /**
  * Created by kuanghaochuan on 2017/8/6.
@@ -20,7 +21,7 @@ public class HandleInputEvent {
     private static long downTime;
 
     public static void init() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        im = (InputManager) InputManager.class.getDeclaredMethod("getInstance", new Class[0]).invoke(null);
+        im = (InputManager) InputManager.class.getDeclaredMethod("getInstance").invoke(null);
         MotionEvent.class.getDeclaredMethod("obtain").setAccessible(true);
         injectInputEventMethod = InputManager.class.getMethod("injectInputEvent", InputEvent.class, Integer.TYPE);
     }
