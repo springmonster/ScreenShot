@@ -1,16 +1,19 @@
 package com.client.script
 
+import okio.buffer
+import okio.sink
 import java.io.File
-import java.io.FileOutputStream
-import java.io.OutputStreamWriter
 
 /**
  * Created by kuanghaochuan on 2017/7/16.
  */
 
-object SaveScript {
-    fun saveFile(file: File, scriptContent: String) {
-        val writer = OutputStreamWriter(FileOutputStream(file, true), "utf-8")
-        writer.use { writer.write(scriptContent) }
+internal fun saveFile(file: File, scriptContent: String) {
+    val sink = file.sink()
+    val buffer = sink.buffer()
+    sink.use {
+        buffer.use {
+            buffer.writeUtf8(scriptContent)
+        }
     }
 }

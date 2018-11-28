@@ -1,8 +1,8 @@
 package com.client.main
 
-import com.client.script.SaveScript
 import com.client.script.UserAction
 import com.client.script.UserActionInterface
+import com.client.script.saveFile
 import java.awt.Color
 import java.awt.Toolkit
 import java.awt.event.*
@@ -14,29 +14,28 @@ import javax.swing.*
 /**
  * Created by kuanghaochuan on 2017/7/13.
  */
-
-class ComputerClientFrame @Throws(IOException::class)
-internal constructor() : JFrame() {
-    internal var mScreenSize = Toolkit.getDefaultToolkit().screenSize
+internal class ComputerClientFrame @Throws(IOException::class) constructor() : JFrame() {
+    private val mScreenSize = Toolkit.getDefaultToolkit().screenSize
     private val mFrameHeight = (mScreenSize.getHeight() * 9 / 10).toInt()
     private val mFrameWidth = (mScreenSize.getHeight() * 9 / 10).toInt()
-    private var mJMenuBar: JMenuBar? = null
-    private var mImageLabel: JLabel? = null
-    private var mMainPanel: JPanel? = null
-    private var mJTextAreaShowScript: JTextArea? = null
-    private var mJScrollPane: JScrollPane? = null
-    private var mJLabelBottomMenu: JLabel? = null
-    private var mJLabelBottomHome: JLabel? = null
-    private var mJLabelBottomBack: JLabel? = null
+
+    private lateinit var mJMenuBar: JMenuBar
+    private lateinit var mImageLabel: JLabel
+    private lateinit var mMainPanel: JPanel
+    private lateinit var mJTextAreaShowScript: JTextArea
+    private lateinit var mJScrollPane: JScrollPane
+    private lateinit var mJLabelBottomMenu: JLabel
+    private lateinit var mJLabelBottomHome: JLabel
+    private lateinit var mJLabelBottomBack: JLabel
 
     private var isMove = false
-    private var writer: BufferedWriter? = null
+    private lateinit var writer: BufferedWriter
     private var mDisplayX: Int = 0
     private var mDisplayY: Int = 0
     private var mDisplayOldX: Int = 0
     private var mDisplayOldY: Int = 0
 
-    private val mUserActionInterface: UserActionInterface?
+    private var mUserActionInterface: UserActionInterface
 
     private var mMoveOldX: Int = 0
     private var mMoveOldY: Int = 0
@@ -61,9 +60,9 @@ internal constructor() : JFrame() {
 
         this.add(mMainPanel)
 
-        mUserActionInterface = UserAction(mJTextAreaShowScript!!)
+        mUserActionInterface = UserAction(mJTextAreaShowScript)
 
-        mMainPanel!!.addKeyListener(LabelMouseKeyListener())
+        mMainPanel.addKeyListener(LabelMouseKeyListener())
         mainPanelRequestFocus()
     }
 
@@ -82,7 +81,7 @@ internal constructor() : JFrame() {
             }
         }
         isScriptShow = scriptViewsVisible
-        mMainPanel!!.updateUI()
+        mMainPanel.updateUI()
     }
 
     private fun createComputerClientFrame() {
@@ -93,9 +92,9 @@ internal constructor() : JFrame() {
         this.title = "Screen Share"
         this.isResizable = false
         this.addWindowListener(object : WindowAdapter() {
-            override fun windowClosing(e: WindowEvent?) {
+            override fun windowClosing(e: WindowEvent) {
                 println("window closing")
-                CommandInstall.execExitAppProcessCommand()
+                execExitAppProcessCommand()
                 super.windowClosing(e)
             }
         })
@@ -113,8 +112,8 @@ internal constructor() : JFrame() {
         val saveJMenuItem = JMenuItem("Save script")
 
         this.jMenuBar = mJMenuBar
-        mJMenuBar!!.add(phoneJMenu)
-        mJMenuBar!!.add(scriptJMenu)
+        mJMenuBar.add(phoneJMenu)
+        mJMenuBar.add(scriptJMenu)
 
         phoneJMenu.add(prepareJMenuItem)
         phoneJMenu.add(connectJMenuItem)
@@ -122,70 +121,72 @@ internal constructor() : JFrame() {
         scriptJMenu.add(disJMenuItem)
         scriptJMenu.add(saveJMenuItem)
 
-        prepareJMenuItem.addActionListener { e -> Thread { CommandInstall.installDex() }.start() }
-        connectJMenuItem.addActionListener { e -> startSocket("127.0.0.1", "3000") }
+        prepareJMenuItem.addActionListener {
+            Thread {
+                installDex()
+            }.start()
+        }
+        connectJMenuItem.addActionListener { startSocket("127.0.0.1", "3000") }
 
-        disJMenuItem.addActionListener { actionEvent ->
-            if (mJScrollPane != null) {
-                if (disJMenuItem.text == "Show script") {
-                    disJMenuItem.text = "Hide script"
-                    setScriptViewsVisible(true)
-                } else if (disJMenuItem.text == "Hide script") {
-                    disJMenuItem.text = "Show script"
-                    setScriptViewsVisible(false)
-                }
+        disJMenuItem.addActionListener {
+            if (disJMenuItem.text == "Show script") {
+                disJMenuItem.text = "Hide script"
+                setScriptViewsVisible(true)
+            } else if (disJMenuItem.text == "Hide script") {
+                disJMenuItem.text = "Show script"
+                setScriptViewsVisible(false)
             }
         }
 
-        saveJMenuItem.addActionListener { e ->
+        saveJMenuItem.addActionListener {
             val fileChooser = JFileChooser()
             val result = fileChooser.showSaveDialog(null)
             if (JFileChooser.APPROVE_OPTION == result) {
                 val file = fileChooser.selectedFile
                 println(file.absolutePath)
-                val scriptContent = mJTextAreaShowScript!!.text
-                SaveScript.saveFile(file, scriptContent)
+                val scriptContent = mJTextAreaShowScript.text
+                saveFile(file, scriptContent)
             }
         }
     }
 
     private fun createScriptPanel() {
         mJTextAreaShowScript = JTextArea()
-        mJTextAreaShowScript!!.setBounds(mFrameWidth / 2, 0, mFrameWidth / 2, mFrameHeight)
-        mJTextAreaShowScript!!.lineWrap = true
-        mJTextAreaShowScript!!.wrapStyleWord = true
+        mJTextAreaShowScript.setBounds(mFrameWidth / 2, 0, mFrameWidth / 2, mFrameHeight)
+        mJTextAreaShowScript.lineWrap = true
+        mJTextAreaShowScript.wrapStyleWord = true
 
         mJScrollPane = JScrollPane(mJTextAreaShowScript)
-        mJScrollPane!!.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_ALWAYS
-        mJScrollPane!!.setBounds(mFrameWidth / 2, 0, mFrameWidth / 2, mFrameHeight)
+        mJScrollPane.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_ALWAYS
+        mJScrollPane.setBounds(mFrameWidth / 2, 0, mFrameWidth / 2, mFrameHeight)
 
-        mMainPanel!!.add(mJScrollPane)
+        mMainPanel.add(mJScrollPane)
     }
 
     private fun createMainPanel() {
         mMainPanel = JPanel()
-        mMainPanel!!.setBounds(0, 0, mFrameWidth, mFrameHeight)
-        mMainPanel!!.layout = null
-        mMainPanel!!.background = Color(220, 240, 250)
+        mMainPanel.setBounds(0, 0, mFrameWidth, mFrameHeight)
+        mMainPanel.layout = null
+        mMainPanel.background = Color(220, 240, 250)
     }
 
     private fun createImageLabel() {
         mImageLabel = JLabel()
-        mImageLabel!!.background = Color.BLACK
-        mImageLabel!!.isOpaque = true
-        mImageLabel!!.setBounds(0, 0, mFrameWidth / 2, mFrameHeight - 80)
-        mImageLabel!!.addMouseListener(LabelMouseClickListener())
-        mImageLabel!!.addMouseMotionListener(LabelMouseMotionListener())
-        mMainPanel!!.add(mImageLabel)
+        mImageLabel.background = Color.BLACK
+        mImageLabel.isOpaque = true
+        mImageLabel.setBounds(0, 0, mFrameWidth / 2, mFrameHeight - 80)
+        mImageLabel.addMouseListener(LabelMouseClickListener())
+        mImageLabel.addMouseMotionListener(LabelMouseMotionListener())
+        mMainPanel.add(mImageLabel)
     }
 
     private fun calcXInDisplay(input: Int): Int {
-        val result = mDisplayX * (input * 1.0f / mImageLabel!!.width)
+        val result = mDisplayX * (input * 1.0f / mImageLabel.width)
         return result.toInt()
     }
 
     private fun calcYInDisplay(input: Int): Int {
-        val result = mDisplayY * (input * 1.0f / mImageLabel!!.height)
+        val result = mDisplayY * (input * 1.0f / mImageLabel.height)
         return result.toInt()
     }
 
@@ -201,66 +202,54 @@ internal constructor() : JFrame() {
         val backImageIcon = ImageIcon(ImageIO.read(File("$path/wiseclientlibrary/images/back.png")))
 
         mJLabelBottomMenu = JLabel(menuImageIcon)
-        mJLabelBottomMenu!!.background = Color.BLACK
-        mJLabelBottomMenu!!.isOpaque = true
-        mJLabelBottomMenu!!.setBounds(0, mImageLabel!!.height, mFrameWidth / 6, 40)
+        mJLabelBottomMenu.background = Color.BLACK
+        mJLabelBottomMenu.isOpaque = true
+        mJLabelBottomMenu.setBounds(0, mImageLabel.height, mFrameWidth / 6, 40)
 
         mJLabelBottomHome = JLabel(homeImageIcon)
-        mJLabelBottomHome!!.background = Color.BLACK
-        mJLabelBottomHome!!.isOpaque = true
-        mJLabelBottomHome!!.setBounds(mFrameWidth / 6, mImageLabel!!.height, mFrameWidth / 6, 40)
+        mJLabelBottomHome.background = Color.BLACK
+        mJLabelBottomHome.isOpaque = true
+        mJLabelBottomHome.setBounds(mFrameWidth / 6, mImageLabel.height, mFrameWidth / 6, 40)
 
         mJLabelBottomBack = JLabel(backImageIcon)
-        mJLabelBottomBack!!.background = Color.BLACK
-        mJLabelBottomBack!!.isOpaque = true
-        mJLabelBottomBack!!.setBounds(mFrameWidth / 6 * 2, mImageLabel!!.height, mFrameWidth / 6, 40)
+        mJLabelBottomBack.background = Color.BLACK
+        mJLabelBottomBack.isOpaque = true
+        mJLabelBottomBack.setBounds(mFrameWidth / 6 * 2, mImageLabel.height, mFrameWidth / 6, 40)
 
-        mMainPanel!!.add(mJLabelBottomMenu)
-        mMainPanel!!.add(mJLabelBottomHome)
-        mMainPanel!!.add(mJLabelBottomBack)
+        mMainPanel.add(mJLabelBottomMenu)
+        mMainPanel.add(mJLabelBottomHome)
+        mMainPanel.add(mJLabelBottomBack)
 
-        mJLabelBottomMenu!!.addMouseListener(object : MouseAdapter() {
-            override fun mouseClicked(mouseEvent: MouseEvent?) {
+        mJLabelBottomMenu.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(mouseEvent: MouseEvent) {
                 super.mouseClicked(mouseEvent)
-                try {
-                    writer!!.write("MENU")
-                    writer!!.newLine()
-                    writer!!.flush()
-                    mUserActionInterface?.actionMenuPress()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
+                writeMouseAction("MENU")
+            }
+        })
+        mJLabelBottomHome.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(mouseEvent: MouseEvent) {
+                super.mouseClicked(mouseEvent)
+                writeMouseAction("HOME")
 
             }
         })
-        mJLabelBottomHome!!.addMouseListener(object : MouseAdapter() {
-            override fun mouseClicked(mouseEvent: MouseEvent?) {
+        mJLabelBottomBack.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(mouseEvent: MouseEvent) {
                 super.mouseClicked(mouseEvent)
-                try {
-                    writer!!.write("HOME")
-                    writer!!.newLine()
-                    writer!!.flush()
-                    mUserActionInterface?.actionHomePress()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-
+                writeMouseAction("BACK")
             }
         })
-        mJLabelBottomBack!!.addMouseListener(object : MouseAdapter() {
-            override fun mouseClicked(mouseEvent: MouseEvent?) {
-                super.mouseClicked(mouseEvent)
-                try {
-                    writer!!.write("BACK")
-                    writer!!.newLine()
-                    writer!!.flush()
-                    mUserActionInterface?.actionBackPress()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
+    }
 
-            }
-        })
+    private fun writeMouseAction(action: String) {
+        try {
+            writer.write(action)
+            writer.newLine()
+            writer.flush()
+            mUserActionInterface.actionHomePress()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun startSocket(ip: String, port: String) {
@@ -305,7 +294,7 @@ internal constructor() : JFrame() {
                         }
                         val byteArrayInputStream = ByteArrayInputStream(bytes)
                         val image = ImageIO.read(byteArrayInputStream)
-                        mImageLabel!!.icon = ScaleIcon(ImageIcon(image))
+                        mImageLabel.icon = ScaleIcon(ImageIcon(image))
                     }
                 } catch (e: IOException) {
                     e.printStackTrace()
@@ -320,12 +309,12 @@ internal constructor() : JFrame() {
 
         if (isVertical) {
             println("screen change to vertical")
-            mImageLabel!!.setBounds(0, 0, mFrameWidth / 2, mFrameHeight - 80)
-            mJLabelBottomMenu!!.setBounds(0, mImageLabel!!.height, mFrameWidth / 6, 40)
-            mJLabelBottomHome!!.setBounds(mFrameWidth / 6, mImageLabel!!.height, mFrameWidth / 6, 40)
-            mJLabelBottomBack!!.setBounds(mFrameWidth / 6 * 2, mImageLabel!!.height, mFrameWidth / 6, 40)
+            mImageLabel.setBounds(0, 0, mFrameWidth / 2, mFrameHeight - 80)
+            mJLabelBottomMenu.setBounds(0, mImageLabel.height, mFrameWidth / 6, 40)
+            mJLabelBottomHome.setBounds(mFrameWidth / 6, mImageLabel.height, mFrameWidth / 6, 40)
+            mJLabelBottomBack.setBounds(mFrameWidth / 6 * 2, mImageLabel.height, mFrameWidth / 6, 40)
 
-            mJScrollPane!!.setBounds(mFrameWidth / 2, 0, mFrameWidth / 2, mFrameHeight)
+            mJScrollPane.setBounds(mFrameWidth / 2, 0, mFrameWidth / 2, mFrameHeight)
 
             if (isScriptShow) {
                 this.setBounds(450, 0, mFrameWidth, mFrameHeight)
@@ -334,12 +323,12 @@ internal constructor() : JFrame() {
             }
         } else {
             println("screen change to landscape")
-            mImageLabel!!.setBounds(0, 0, mFrameWidth, mFrameHeight / 2 - 40)
-            mJLabelBottomMenu!!.setBounds(0, mImageLabel!!.height, mFrameWidth / 3, 40)
-            mJLabelBottomHome!!.setBounds(mFrameWidth / 3, mImageLabel!!.height, mFrameWidth / 3, 40)
-            mJLabelBottomBack!!.setBounds(mFrameWidth / 3 * 2, mImageLabel!!.height, mFrameWidth / 3, 40)
+            mImageLabel.setBounds(0, 0, mFrameWidth, mFrameHeight / 2 - 40)
+            mJLabelBottomMenu.setBounds(0, mImageLabel.height, mFrameWidth / 3, 40)
+            mJLabelBottomHome.setBounds(mFrameWidth / 3, mImageLabel.height, mFrameWidth / 3, 40)
+            mJLabelBottomBack.setBounds(mFrameWidth / 3 * 2, mImageLabel.height, mFrameWidth / 3, 40)
 
-            mJScrollPane!!.setBounds(0, mFrameHeight / 2, mFrameWidth, mFrameHeight / 2)
+            mJScrollPane.setBounds(0, mFrameHeight / 2, mFrameWidth, mFrameHeight / 2)
 
             if (isScriptShow) {
                 this.setBounds(450, 0, mFrameWidth, mFrameHeight)
@@ -347,47 +336,47 @@ internal constructor() : JFrame() {
                 this.setBounds(450, 0, mFrameWidth, mFrameHeight / 2)
             }
         }
-        mMainPanel!!.validate()
-        mMainPanel!!.repaint()
+        mMainPanel.validate()
+        mMainPanel.repaint()
     }
 
     internal inner class LabelMouseClickListener : MouseAdapter() {
-        override fun mouseClicked(mouseEvent: MouseEvent?) {
+        override fun mouseClicked(mouseEvent: MouseEvent) {
             mainPanelRequestFocus()
 
             super.mouseClicked(mouseEvent)
             try {
-                val x = mouseEvent!!.x
+                val x = mouseEvent.x
                 val y = mouseEvent.y
                 val calcX = calcXInDisplay(x)
                 val calcY = calcYInDisplay(y)
 
-                writer!!.write("DOWN$calcX#$calcY")
-                writer!!.newLine()
-                writer!!.write("UP$calcX#$calcY")
-                writer!!.newLine()
-                writer!!.flush()
-                mUserActionInterface?.actionViewClick(calcX, calcY)
+                writer.write("DOWN$calcX#$calcY")
+                writer.newLine()
+                writer.write("UP$calcX#$calcY")
+                writer.newLine()
+                writer.flush()
+                mUserActionInterface.actionViewClick(calcX, calcY)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
 
         }
 
-        override fun mouseReleased(mouseEvent: MouseEvent?) {
+        override fun mouseReleased(mouseEvent: MouseEvent) {
             mainPanelRequestFocus()
 
             super.mouseReleased(mouseEvent)
             try {
-                val x = mouseEvent!!.x
+                val x = mouseEvent.x
                 val y = mouseEvent.y
-                writer!!.write("UP" + calcXInDisplay(x) + "#" + calcYInDisplay(y))
-                writer!!.newLine()
-                writer!!.flush()
+                writer.write("UP" + calcXInDisplay(x) + "#" + calcYInDisplay(y))
+                writer.newLine()
+                writer.flush()
                 if (isMove) {
                     mMoveNewX = calcXInDisplay(x)
                     mMoveNewY = calcYInDisplay(y)
-                    mUserActionInterface?.actionViewMove(mMoveOldX, mMoveOldY, mMoveNewX, mMoveNewY)
+                    mUserActionInterface.actionViewMove(mMoveOldX, mMoveOldY, mMoveNewX, mMoveNewY)
                 }
                 isMove = false
             } catch (e: Exception) {
@@ -398,25 +387,25 @@ internal constructor() : JFrame() {
     }
 
     internal inner class LabelMouseMotionListener : MouseAdapter() {
-        override fun mouseDragged(mouseEvent: MouseEvent?) {
+        override fun mouseDragged(mouseEvent: MouseEvent) {
             mainPanelRequestFocus()
 
             super.mouseDragged(mouseEvent)
             try {
-                val x = mouseEvent!!.x
+                val x = mouseEvent.x
                 val y = mouseEvent.y
                 if (!isMove) {
                     isMove = true
-                    writer!!.write("DOWN" + calcXInDisplay(x) + "#" + calcYInDisplay(y))
+                    writer.write("DOWN" + calcXInDisplay(x) + "#" + calcYInDisplay(y))
                     mMoveOldX = calcXInDisplay(x)
                     mMoveOldY = calcYInDisplay(y)
                     println("move down x " + calcXInDisplay(x))
                 } else {
-                    writer!!.write("MOVE" + calcXInDisplay(x) + "#" + calcYInDisplay(y))
+                    writer.write("MOVE" + calcXInDisplay(x) + "#" + calcYInDisplay(y))
                     println("move move x " + calcXInDisplay(x))
                 }
-                writer!!.newLine()
-                writer!!.flush()
+                writer.newLine()
+                writer.flush()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -425,8 +414,8 @@ internal constructor() : JFrame() {
     }
 
     private fun mainPanelRequestFocus() {
-        mMainPanel!!.isFocusable = true
-        mMainPanel!!.requestFocus()
+        mMainPanel.isFocusable = true
+        mMainPanel.requestFocus()
     }
 
     internal inner class LabelMouseKeyListener : KeyListener {
@@ -438,27 +427,27 @@ internal constructor() : JFrame() {
                 val code = e.keyCode
 
                 if (code == KeyEvent.VK_UP) {
-                    writer!!.write("KEY_UP")
-                    mUserActionInterface?.actionKeyUpPress()
+                    writer.write("KEY_UP")
+                    mUserActionInterface.actionKeyUpPress()
                 } else if (code == KeyEvent.VK_DOWN) {
-                    writer!!.write("KEY_DOWN")
-                    mUserActionInterface?.actionKeyDownPress()
+                    writer.write("KEY_DOWN")
+                    mUserActionInterface.actionKeyDownPress()
                 } else if (code == KeyEvent.VK_LEFT) {
-                    writer!!.write("KEY_LEFT")
-                    mUserActionInterface?.actionKeyLeftPress()
+                    writer.write("KEY_LEFT")
+                    mUserActionInterface.actionKeyLeftPress()
                 } else if (code == KeyEvent.VK_RIGHT) {
-                    writer!!.write("KEY_RIGHT")
-                    mUserActionInterface?.actionKeyRightPress()
+                    writer.write("KEY_RIGHT")
+                    mUserActionInterface.actionKeyRightPress()
                 } else if (code == KeyEvent.VK_ENTER) {
-                    writer!!.write("KEY_ENTER")
-                    mUserActionInterface?.actionKeyEnterPress()
+                    writer.write("KEY_ENTER")
+                    mUserActionInterface.actionKeyEnterPress()
                 } else if (code == KeyEvent.VK_ESCAPE) {
-                    writer!!.write("KEY_ESC")
-                    mUserActionInterface?.actionKeyBackPress()
+                    writer.write("KEY_ESC")
+                    mUserActionInterface.actionKeyBackPress()
                 }
 
-                writer!!.newLine()
-                writer!!.flush()
+                writer.newLine()
+                writer.flush()
             } catch (e1: IOException) {
                 e1.printStackTrace()
             }

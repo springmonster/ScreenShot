@@ -5,5 +5,5 @@ package com.client.script
  */
 
 interface ScriptInterface {
-    fun handleScript(stringBuilder: StringBuilder)
+    fun handleScript(value: String)
 }

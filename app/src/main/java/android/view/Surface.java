@@ -12,7 +12,7 @@ public class Surface {
     public static final int ROTATION_180 = 2;
     public static final int ROTATION_270 = 3;
 
-    public static Bitmap screenshot(int x, int y){
+    public static Bitmap screenshot(int x, int y) {
         return null;
     }
 }

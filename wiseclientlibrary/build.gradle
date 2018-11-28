@@ -3,6 +3,7 @@ apply plugin: "kotlin"
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    compile 'com.squareup.okio:okio:2.1.0'
 }
 
 jar {

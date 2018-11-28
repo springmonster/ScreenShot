@@ -6,7 +6,7 @@ import javax.swing.JTextArea
  * Created by kuanghaochuan on 2017/7/11.
  */
 
-class UserAction(private val mJTextArea: JTextArea) : UserActionInterface {
+internal class UserAction(private val mJTextArea: JTextArea) : UserActionInterface {
     private val mDisplayScript: ScriptInterface
 
     init {
@@ -14,128 +14,146 @@ class UserAction(private val mJTextArea: JTextArea) : UserActionInterface {
     }
 
     override fun actionViewClick(x: Int, y: Int) {
-        val stringBuilder = StringBuilder()
-        stringBuilder.append("TOUCH|{'x':$x,'y':$y,'type':'downAndUp',}")
-        stringBuilder.append("\n")
-        stringBuilder.append("WAIT|{'seconds':4.0,}")
-        stringBuilder.append("\n")
+        val result = appendString {
+            append("TOUCH|{'x':$x,'y':$y,'type':'downAndUp',}")
+            append("\n")
+            append("WAIT|{'seconds':4.0,}")
+            append("\n")
+        }
 
         println("actionViewClick x is $x y is $y")
 
-        mDisplayScript.handleScript(stringBuilder)
+        mDisplayScript.handleScript(result)
     }
 
     override fun actionViewMove(oldX: Int, oldY: Int, newX: Int, newY: Int) {
-        val stringBuilder = StringBuilder()
-        stringBuilder.append("DRAG|{'start':($oldX,$oldY),'end':($newX,$newY),'duration':1.0,'steps':10,}")
-        stringBuilder.append("\n")
+        val result = appendString {
+            append("DRAG|{'start':($oldX,$oldY),'end':($newX,$newY),'duration':1.0,'steps':10,}")
+            append("\n")
+        }
 
         println("actionViewMove")
 
-        mDisplayScript.handleScript(stringBuilder)
+        mDisplayScript.handleScript(result)
     }
 
     override fun actionBackPress() {
-        val stringBuilder = StringBuilder()
-        stringBuilder.append("PRESS|{'name':'BACK','type':'downAndUp',}")
-        stringBuilder.append("\n")
-        stringBuilder.append("WAIT|{'seconds':1.0,}")
-        stringBuilder.append("\n")
+        val result = appendString {
+            append("PRESS|{'name':'BACK','type':'downAndUp',}")
+            append("\n")
+            append("WAIT|{'seconds':1.0,}")
+            append("\n")
+        }
 
         println("actionBackPress")
 
-        mDisplayScript.handleScript(stringBuilder)
+        mDisplayScript.handleScript(result)
     }
 
     override fun actionMenuPress() {
-        val stringBuilder = StringBuilder()
-        stringBuilder.append("PRESS|{'name':'MENU','type':'downAndUp',}")
-        stringBuilder.append("\n")
-
+        val result = appendString {
+            append("PRESS|{'name':'MENU','type':'downAndUp',}")
+            append("\n")
+        }
         println("actionMenuPress")
 
-        mDisplayScript.handleScript(stringBuilder)
+        mDisplayScript.handleScript(result)
     }
 
     override fun actionHomePress() {
-        val stringBuilder = StringBuilder()
-        stringBuilder.append("PRESS|{'name':'HOME','type':'downAndUp',}")
-        stringBuilder.append("\n")
+        val result = appendString {
+            append("PRESS|{'name':'HOME','type':'downAndUp',}")
+            append("\n")
+        }
 
         println("actionHomePress")
 
-        mDisplayScript.handleScript(stringBuilder)
+        mDisplayScript.handleScript(result)
     }
 
     override fun actionKeyUpPress() {
-        val stringBuilder = StringBuilder()
-        stringBuilder.append("device.press('KEYCODE_DPAD_UP',MonkeyDevice.DOWN_AND_UP)")
-        stringBuilder.append("\n")
-        stringBuilder.append("MonkeyRunner.sleep(1.5)")
-        stringBuilder.append("\n")
+        val result = appendString {
+            append("device.press('KEYCODE_DPAD_UP',MonkeyDevice.DOWN_AND_UP)")
+            append("\n")
+            append("MonkeyRunner.sleep(1.5)")
+            append("\n")
+        }
 
         println("actionKeyUpPress")
 
-        mDisplayScript.handleScript(stringBuilder)
+        mDisplayScript.handleScript(result)
     }
 
     override fun actionKeyDownPress() {
-        val stringBuilder = StringBuilder()
-        stringBuilder.append("device.press('KEYCODE_DPAD_DOWN',MonkeyDevice.DOWN_AND_UP)")
-        stringBuilder.append("\n")
-        stringBuilder.append("MonkeyRunner.sleep(1.5)")
-        stringBuilder.append("\n")
+        val result = appendString {
+            append("device.press('KEYCODE_DPAD_DOWN',MonkeyDevice.DOWN_AND_UP)")
+            append("\n")
+            append("MonkeyRunner.sleep(1.5)")
+            append("\n")
+        }
 
         println("actionKeyDownPress")
 
-        mDisplayScript.handleScript(stringBuilder)
+        mDisplayScript.handleScript(result)
     }
 
     override fun actionKeyLeftPress() {
-        val stringBuilder = StringBuilder()
-        stringBuilder.append("device.press('KEYCODE_DPAD_LEFT',MonkeyDevice.DOWN_AND_UP)")
-        stringBuilder.append("\n")
-        stringBuilder.append("MonkeyRunner.sleep(1.5)")
-        stringBuilder.append("\n")
+        val result = appendString {
+            append("device.press('KEYCODE_DPAD_LEFT',MonkeyDevice.DOWN_AND_UP)")
+            append("\n")
+            append("MonkeyRunner.sleep(1.5)")
+            append("\n")
+        }
 
         println("actionKeyLeftPress")
 
-        mDisplayScript.handleScript(stringBuilder)
+        mDisplayScript.handleScript(result)
     }
 
     override fun actionKeyRightPress() {
-        val stringBuilder = StringBuilder()
-        stringBuilder.append("device.press('KEYCODE_DPAD_RIGHT',MonkeyDevice.DOWN_AND_UP)")
-        stringBuilder.append("\n")
-        stringBuilder.append("MonkeyRunner.sleep(1.5)")
-        stringBuilder.append("\n")
+        val result = appendString {
+            append("device.press('KEYCODE_DPAD_RIGHT',MonkeyDevice.DOWN_AND_UP)")
+            append("\n")
+            append("MonkeyRunner.sleep(1.5)")
+            append("\n")
+        }
 
         println("actionKeyRightPress")
 
-        mDisplayScript.handleScript(stringBuilder)
+        mDisplayScript.handleScript(result)
     }
 
     override fun actionKeyEnterPress() {
-        val stringBuilder = StringBuilder()
-        stringBuilder.append("device.press('KEYCODE_DPAD_CENTER',MonkeyDevice.DOWN_AND_UP)")
-        stringBuilder.append("\n")
-        stringBuilder.append("MonkeyRunner.sleep(1.5)")
-        stringBuilder.append("\n")
+        val result = appendString {
+            append("device.press('KEYCODE_DPAD_CENTER',MonkeyDevice.DOWN_AND_UP)")
+            append("\n")
+            append("MonkeyRunner.sleep(1.5)")
+            append("\n")
+        }
 
         println("actionKeyEnterPress")
 
-        mDisplayScript.handleScript(stringBuilder)
+        mDisplayScript.handleScript(result)
+
     }
 
     override fun actionKeyBackPress() {
-        val stringBuilder = StringBuilder()
-        stringBuilder.append("device.press('KEYCODE_BACK',MonkeyDevice.DOWN_AND_UP)")
-        stringBuilder.append("\n")
-        stringBuilder.append("MonkeyRunner.sleep(1.5)")
-        stringBuilder.append("\n")
+        val result = appendString {
+            append("device.press('KEYCODE_BACK',MonkeyDevice.DOWN_AND_UP)")
+            append("\n")
+            append("MonkeyRunner.sleep(1.5)")
+            append("\n")
+        }
 
         println("actionKeyBackPress")
 
-        mDisplayScript.handleScript(stringBuilder)
+        mDisplayScript.handleScript(result)
+    }
+
+    private inline fun appendString(appendFun: StringBuilder.() -> Unit): String {
+        with(StringBuilder()) {
+            appendFun()
+            return toString()
+        }
     }
 }

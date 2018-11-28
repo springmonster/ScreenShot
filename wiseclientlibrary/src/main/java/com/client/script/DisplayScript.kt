@@ -8,7 +8,7 @@ import javax.swing.JTextArea
 
 class DisplayScript internal constructor(private val mJTextArea: JTextArea) : ScriptInterface {
 
-    override fun handleScript(stringBuilder: StringBuilder) {
-        this.mJTextArea.append(stringBuilder.toString())
+    override fun handleScript(value: String) {
+        this.mJTextArea.append(value)
     }
 }

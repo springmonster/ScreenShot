@@ -15,59 +15,59 @@ import androidx.core.view.InputDeviceCompat;
  * Created by kuanghaochuan on 2017/8/6.
  */
 
-public class HandleInputEvent {
+class HandleInputEvent {
     private static InputManager im;
     private static Method injectInputEventMethod;
     private static long downTime;
 
-    public static void init() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    static void init() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         im = (InputManager) InputManager.class.getDeclaredMethod("getInstance").invoke(null);
         MotionEvent.class.getDeclaredMethod("obtain").setAccessible(true);
         injectInputEventMethod = InputManager.class.getMethod("injectInputEvent", InputEvent.class, Integer.TYPE);
     }
 
-    public static void pressLeft() throws InvocationTargetException, IllegalAccessException {
+    static void pressLeft() throws InvocationTargetException, IllegalAccessException {
         sendKeyEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_KEYBOARD, KeyEvent.KEYCODE_DPAD_LEFT, false);
     }
 
-    public static void pressRight() throws InvocationTargetException, IllegalAccessException {
+    static void pressRight() throws InvocationTargetException, IllegalAccessException {
         sendKeyEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_KEYBOARD, KeyEvent.KEYCODE_DPAD_RIGHT, false);
     }
 
-    public static void pressUp() throws InvocationTargetException, IllegalAccessException {
+    static void pressUp() throws InvocationTargetException, IllegalAccessException {
         sendKeyEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_KEYBOARD, KeyEvent.KEYCODE_DPAD_UP, false);
     }
 
-    public static void pressDown() throws InvocationTargetException, IllegalAccessException {
+    static void pressDown() throws InvocationTargetException, IllegalAccessException {
         sendKeyEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_KEYBOARD, KeyEvent.KEYCODE_DPAD_DOWN, false);
     }
 
-    public static void pressEnter() throws InvocationTargetException, IllegalAccessException {
+    static void pressEnter() throws InvocationTargetException, IllegalAccessException {
         sendKeyEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_KEYBOARD, KeyEvent.KEYCODE_ENTER, false);
     }
 
-    public static void pressMenu() throws InvocationTargetException, IllegalAccessException {
+    static void pressMenu() throws InvocationTargetException, IllegalAccessException {
         sendKeyEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_KEYBOARD, KeyEvent.KEYCODE_MENU, false);
     }
 
-    public static void pressHome() throws InvocationTargetException, IllegalAccessException {
+    static void pressHome() throws InvocationTargetException, IllegalAccessException {
         sendKeyEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_KEYBOARD, KeyEvent.KEYCODE_HOME, false);
     }
 
-    public static void pressBack() throws InvocationTargetException, IllegalAccessException {
+    static void pressBack() throws InvocationTargetException, IllegalAccessException {
         sendKeyEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_KEYBOARD, KeyEvent.KEYCODE_BACK, false);
     }
 
-    public static void touchDown(float clientX, float clientY) throws InvocationTargetException, IllegalAccessException {
+    static void touchDown(float clientX, float clientY) throws InvocationTargetException, IllegalAccessException {
         downTime = SystemClock.uptimeMillis();
         injectMotionEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_TOUCHSCREEN, MotionEvent.ACTION_DOWN, downTime, downTime, clientX, clientY, 1.0f);
     }
 
-    public static void touchUp(float clientX, float clientY) throws InvocationTargetException, IllegalAccessException {
+    static void touchUp(float clientX, float clientY) throws InvocationTargetException, IllegalAccessException {
         injectMotionEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_TOUCHSCREEN, MotionEvent.ACTION_UP, downTime, SystemClock.uptimeMillis(), clientX, clientY, 1.0f);
     }
 
-    public static void touchMove(float clientX, float clientY) throws InvocationTargetException, IllegalAccessException {
+    static void touchMove(float clientX, float clientY) throws InvocationTargetException, IllegalAccessException {
         injectMotionEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_TOUCHSCREEN, MotionEvent.ACTION_MOVE, downTime, SystemClock.uptimeMillis(), clientX, clientY, 1.0f);
     }
 
