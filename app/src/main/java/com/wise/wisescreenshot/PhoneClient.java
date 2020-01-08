@@ -3,6 +3,7 @@ package com.wise.wisescreenshot;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.hardware.display.IDisplayManager;
 import android.net.LocalServerSocket;
 import android.net.LocalSocket;
@@ -11,6 +12,7 @@ import android.os.IBinder;
 import android.view.DisplayInfo;
 import android.view.IWindowManager;
 import android.view.Surface;
+import android.view.SurfaceControl;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -220,7 +222,7 @@ public class PhoneClient {
      *
      * @throws Exception
      */
-    private static Bitmap screenshot() {
+    private static Bitmap screenshot() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         try {
             String surfaceClassName;
             Point size = getCurrentDisplaySize();
@@ -228,12 +230,15 @@ public class PhoneClient {
             size.x *= scale;
             size.y *= scale;
 
+            Bitmap bitmap = null;
             if (Build.VERSION.SDK_INT <= 17) {
                 surfaceClassName = "android.view.Surface";
+                bitmap = (Bitmap) Class.forName(surfaceClassName).getDeclaredMethod("screenshot", Integer.TYPE, Integer.TYPE).invoke(null, Integer.valueOf(size.x), Integer.valueOf(size.y));
+            } else if (Build.VERSION.SDK_INT < 28) {
+                bitmap = SurfaceControl.screenshot(size.x, size.y);
             } else {
-                surfaceClassName = "android.view.SurfaceControl";
+                bitmap = SurfaceControl.screenshot(new Rect(0, 0, size.x, size.y), size.x, size.y, 0);
             }
-            Bitmap bitmap = (Bitmap) Class.forName(surfaceClassName).getDeclaredMethod("screenshot", new Class[]{Integer.TYPE, Integer.TYPE}).invoke(null, Integer.valueOf(size.x), Integer.valueOf(size.y));
             if (rotation == 0) {
                 return bitmap;
             }
