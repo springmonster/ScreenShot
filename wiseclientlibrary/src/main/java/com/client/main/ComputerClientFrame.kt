@@ -5,11 +5,9 @@ import com.client.script.UserActionInterface
 import com.client.script.saveFile
 import java.awt.Color
 import java.awt.Toolkit
-import java.awt.event.*
-import java.io.*
+import java.io.File
 import java.net.Socket
 import javax.imageio.ImageIO
-import javax.swing.*
 
 /**
  * Created by kuanghaochuan on 2017/7/13.
@@ -56,7 +54,7 @@ internal class ComputerClientFrame @Throws(IOException::class) constructor() : J
 
         createScriptPanel()
 
-        setScriptViewsVisible(false)
+//        setScriptViewsVisible(false)
 
         this.add(mMainPanel)
 
