@@ -100,7 +100,7 @@ private fun execAdbForwardCommand() {
 private fun execAppProcessCommand() {
     //        String findApkCmd = "export CLASSPATH=/data/app/com.wise.wisescreenshot-1/base.apk";
     val findApkCmd = "export CLASSPATH=/sdcard/PhoneClient.apk"
-    val startApkCmd = "exec app_process /sdcard com.wise.wisescreenshot.PhoneClient"
+    val startApkCmd = "exec app_process /sdcard com.kuang.screenshot.PhoneClient"
 
     val commands: Array<String>
 

@@ -1,4 +1,4 @@
-package com.wise.wisescreenshot;
+package com.kuang.screenshot;
 
 import android.hardware.input.InputManager;
 import android.os.SystemClock;
@@ -6,10 +6,10 @@ import android.view.InputEvent;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
+import androidx.core.view.InputDeviceCompat;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
-import androidx.core.view.InputDeviceCompat;
 
 /**
  * Created by kuanghaochuan on 2017/8/6.

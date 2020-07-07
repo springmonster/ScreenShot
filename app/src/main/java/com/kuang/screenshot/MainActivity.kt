@@ -1,4 +1,4 @@
-package com.wise.wisescreenshot
+package com.kuang.screenshot
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

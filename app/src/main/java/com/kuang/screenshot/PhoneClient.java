@@ -1,18 +1,9 @@
-package com.wise.wisescreenshot;
+package com.kuang.screenshot;
 
 import android.graphics.Bitmap;
-import android.graphics.Matrix;
 import android.graphics.Point;
-import android.graphics.Rect;
-import android.hardware.display.IDisplayManager;
 import android.net.LocalServerSocket;
 import android.net.LocalSocket;
-import android.os.Build;
-import android.os.IBinder;
-import android.view.DisplayInfo;
-import android.view.IWindowManager;
-import android.view.Surface;
-import android.view.SurfaceControl;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -21,7 +12,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 /**
  * Created by kuanghaochuan on 2017/7/13.
@@ -96,13 +86,13 @@ public class PhoneClient {
                     BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(localSocket.getOutputStream());
                     DataOutputStream dataOutputStream = new DataOutputStream(bufferedOutputStream);
                     while (true) {
-                        int x = getCurrentDisplaySize().x;
-                        int y = getCurrentDisplaySize().y;
+                        int x = ScreenUtils.getDisplaySize().x;
+                        int y = ScreenUtils.getDisplaySize().y;
 
                         dataOutputStream.writeInt(x);
                         dataOutputStream.writeInt(y);
 
-                        Bitmap bitmap = screenshot();
+                        Bitmap bitmap = ScreenUtils.screenshot();
                         if (bitmap == null) {
                             return;
                         }
@@ -215,83 +205,5 @@ public class PhoneClient {
             e.printStackTrace();
         }
         return null;
-    }
-
-    /**
-     * 进行图像截取
-     *
-     * @throws Exception
-     */
-    private static Bitmap screenshot() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        try {
-            String surfaceClassName;
-            Point size = getCurrentDisplaySize();
-
-            size.x *= scale;
-            size.y *= scale;
-
-            Bitmap bitmap = null;
-            if (Build.VERSION.SDK_INT <= 17) {
-                surfaceClassName = "android.view.Surface";
-                bitmap = (Bitmap) Class.forName(surfaceClassName).getDeclaredMethod("screenshot", Integer.TYPE, Integer.TYPE).invoke(null, Integer.valueOf(size.x), Integer.valueOf(size.y));
-            } else if (Build.VERSION.SDK_INT < 28) {
-                bitmap = SurfaceControl.screenshot(size.x, size.y);
-            } else {
-                bitmap = SurfaceControl.screenshot(new Rect(0, 0, size.x, size.y), size.x, size.y, 0);
-            }
-            if (rotation == 0) {
-                return bitmap;
-            }
-            Matrix m = new Matrix();
-            if (Surface.ROTATION_90 == rotation) {
-                m.postRotate(-90.0f);
-            } else if (Surface.ROTATION_180 == rotation) {
-                m.postRotate(-180.0f);
-            } else if (Surface.ROTATION_270 == rotation) {
-                m.postRotate(-270.0f);
-            }
-            return Bitmap.createBitmap(bitmap, 0, 0, size.x, size.y, m, false);
-        } catch (Exception e) {
-            System.out.println("screen shot error");
-            System.out.println(e.getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * 获取屏幕的高度和宽度
-     */
-    private static Point getCurrentDisplaySize() {
-        try {
-            Method getServiceMethod = Class.forName("android.os.ServiceManager").getDeclaredMethod("getService", String.class);
-            Point point = new Point();
-            IWindowManager wm;
-            if (Build.VERSION.SDK_INT >= 18) {
-                wm = IWindowManager.Stub.asInterface((IBinder) getServiceMethod.invoke(null, "window"));
-                wm.getInitialDisplaySize(0, point);
-                if (Build.VERSION.SDK_INT < 26) {
-                    rotation = wm.getRotation();
-                } else {
-                    rotation = wm.getDefaultDisplayRotation();
-                }
-            } else if (Build.VERSION.SDK_INT == 17) {
-                DisplayInfo di = IDisplayManager.Stub.asInterface((IBinder) getServiceMethod.invoke(null, "display")).getDisplayInfo(0);
-                point.x = ((Integer) DisplayInfo.class.getDeclaredField("logicalWidth").get(di)).intValue();
-                point.y = ((Integer) DisplayInfo.class.getDeclaredField("logicalHeight").get(di)).intValue();
-                rotation = ((Integer) DisplayInfo.class.getDeclaredField("rotation").get(di)).intValue();
-            } else {
-                wm = IWindowManager.Stub.asInterface((IBinder) getServiceMethod.invoke(null, "window"));
-                wm.getRealDisplaySize(point);
-                rotation = wm.getRotation();
-            }
-            if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
-                int temp = point.x;
-                point.x = point.y;
-                point.y = temp;
-            }
-            return point;
-        } catch (Exception e) {
-            throw new AssertionError(e);
-        }
     }
 }
