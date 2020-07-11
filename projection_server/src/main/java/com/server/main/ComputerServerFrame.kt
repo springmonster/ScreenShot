@@ -1,7 +1,6 @@
 package com.server.main
 
-import com.server.script.UserAction
-import com.server.script.UserActionInterface
+import com.server.script.UserActionManager
 import com.server.script.saveFile
 import java.awt.Color
 import java.awt.Toolkit
@@ -38,7 +37,7 @@ internal class ComputerServerFrame @Throws(IOException::class) constructor() : J
     private var mDisplayOldX: Int = 0
     private var mDisplayOldY: Int = 0
 
-    private var mUserActionInterface: UserActionInterface
+    private var userActionManager: UserActionManager
 
     private var mMoveOldX: Int = 0
     private var mMoveOldY: Int = 0
@@ -61,7 +60,7 @@ internal class ComputerServerFrame @Throws(IOException::class) constructor() : J
 
         this.add(mMainPanel)
 
-        mUserActionInterface = UserAction(mJTextAreaShowScript)
+        userActionManager = UserActionManager(mJTextAreaShowScript)
 
         mainPanelRequestFocus()
     }
@@ -99,6 +98,7 @@ internal class ComputerServerFrame @Throws(IOException::class) constructor() : J
         val scriptJMenu = JMenu("Script")
         val disJMenuItem = JMenuItem("Show script")
         val saveJMenuItem = JMenuItem("Save script")
+        val replayJMenuItem = JMenuItem("Replay script")
 
         this.jMenuBar = mJMenuBar
         mJMenuBar.add(phoneJMenu)
@@ -109,6 +109,7 @@ internal class ComputerServerFrame @Throws(IOException::class) constructor() : J
 
         scriptJMenu.add(disJMenuItem)
         scriptJMenu.add(saveJMenuItem)
+        scriptJMenu.add(replayJMenuItem)
 
         prepareJMenuItem.addActionListener {
             Thread {
@@ -136,6 +137,22 @@ internal class ComputerServerFrame @Throws(IOException::class) constructor() : J
                 val scriptContent = mJTextAreaShowScript.text
                 saveFile(file, scriptContent)
             }
+        }
+
+        replayJMenuItem.addActionListener {
+            Thread(Runnable {
+                val tempList = ArrayList<String>()
+                tempList.addAll(userActionManager.strList)
+
+                println("server replay ${tempList.size}")
+
+                for (s in tempList) {
+                    writer.write(s)
+                    writer.flush()
+                    Thread.sleep(500)
+                    println("server replay $s")
+                }
+            }).start()
         }
     }
 
@@ -252,7 +269,9 @@ internal class ComputerServerFrame @Throws(IOException::class) constructor() : J
             writer.write(action)
             writer.newLine()
             writer.flush()
-            mUserActionInterface.actionHomePress()
+
+            userActionManager.saveAction(action)
+            userActionManager.saveAction("\n")
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -275,13 +294,13 @@ internal class ComputerServerFrame @Throws(IOException::class) constructor() : J
                     // 判断是否有屏幕旋转
                     getWidthAndHeight()
 
-                    println("server x is $mDisplayX")
-                    println("server x is $mDisplayY")
+//                    println("server x is $mDisplayX")
+//                    println("server x is $mDisplayY")
 
                     // 获取图片的大小
                     val size = dataInputStream.readInt()
 
-                    println("server data size is $size")
+//                    println("server data size is $size")
 
                     // 获取图片的字节数组并展示
                     if (bytes == null) {
@@ -300,8 +319,8 @@ internal class ComputerServerFrame @Throws(IOException::class) constructor() : J
                     val scaleIcon = ScaleIcon(ImageIcon(image))
                     mImageLabel.icon = scaleIcon
 
-                    println("server image width is ${scaleIcon.iconWidth}")
-                    println("server image height is ${scaleIcon.iconHeight}")
+//                    println("server image width is ${scaleIcon.iconWidth}")
+//                    println("server image height is ${scaleIcon.iconHeight}")
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -376,15 +395,19 @@ internal class ComputerServerFrame @Throws(IOException::class) constructor() : J
                 val calcX = calcXInDisplay(x)
                 val calcY = calcYInDisplay(y)
 
-                println("server calc x is $calcX")
-                println("server calc y is $calcY")
+//                println("server calc x is $calcX")
+//                println("server calc y is $calcY")
 
                 writer.write("DOWN$calcX#$calcY")
                 writer.newLine()
                 writer.write("UP$calcX#$calcY")
                 writer.newLine()
                 writer.flush()
-                mUserActionInterface.actionViewClick(calcX, calcY)
+
+                userActionManager.saveAction("DOWN$calcX#$calcY")
+                userActionManager.saveAction("\n")
+                userActionManager.saveAction("UP$calcX#$calcY")
+                userActionManager.saveAction("\n")
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -395,21 +418,24 @@ internal class ComputerServerFrame @Throws(IOException::class) constructor() : J
             mainPanelRequestFocus()
 
             super.mouseReleased(mouseEvent)
-            try {
-                val x = mouseEvent.x
-                val y = mouseEvent.y
-                writer.write("UP" + calcXInDisplay(x) + "#" + calcYInDisplay(y))
-                writer.newLine()
-                writer.flush()
-                if (isMove) {
-                    mMoveNewX = calcXInDisplay(x)
-                    mMoveNewY = calcYInDisplay(y)
-                    mUserActionInterface.actionViewMove(mMoveOldX, mMoveOldY, mMoveNewX, mMoveNewY)
-                }
-                isMove = false
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+//            try {
+//                val x = mouseEvent.x
+//                val y = mouseEvent.y
+//                writer.write("UP" + calcXInDisplay(x) + "#" + calcYInDisplay(y))
+//                writer.newLine()
+//                writer.flush()
+//
+//                userActionManager.saveAction("UP" + calcXInDisplay(x) + "#" + calcYInDisplay(y))
+//                userActionManager.saveAction("\n")
+//
+//                if (isMove) {
+//                    mMoveNewX = calcXInDisplay(x)
+//                    mMoveNewY = calcYInDisplay(y)
+//                }
+//                isMove = false
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//            }
 
         }
     }
@@ -431,12 +457,18 @@ internal class ComputerServerFrame @Throws(IOException::class) constructor() : J
                     mMoveOldX = calcXInDisplay(x)
                     mMoveOldY = calcYInDisplay(y)
                     println("move down x " + calcXInDisplay(x))
+
+                    userActionManager.saveAction("DOWN" + calcXInDisplay(x) + "#" + calcYInDisplay(y))
                 } else {
                     writer.write("MOVE" + calcXInDisplay(x) + "#" + calcYInDisplay(y))
                     println("move move x " + calcXInDisplay(x))
+
+                    userActionManager.saveAction("MOVE" + calcXInDisplay(x) + "#" + calcYInDisplay(y))
                 }
                 writer.newLine()
                 writer.flush()
+
+                userActionManager.saveAction("\n")
             } catch (e: Exception) {
                 e.printStackTrace()
             }
