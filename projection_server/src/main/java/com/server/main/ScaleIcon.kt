@@ -22,15 +22,16 @@ class ScaleIcon internal constructor(private val icon: Icon) : Icon {
         return icon.iconWidth
     }
 
-    override fun paintIcon(c: Component, g: Graphics, x: Int, y: Int) {
-        val wid = c.width.toFloat()
-        val hei = c.height.toFloat()
+    override fun paintIcon(component: Component, g: Graphics, x: Int, y: Int) {
+        val wid = component.width.toFloat()
+        val hei = component.height.toFloat()
+
         val iconWid = icon.iconWidth
         val iconHei = icon.iconHeight
 
         val g2d = g as Graphics2D
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR)
         g2d.scale((wid / iconWid).toDouble(), (hei / iconHei).toDouble())
-        icon.paintIcon(c, g2d, 0, 0)
+        icon.paintIcon(component, g2d, 0, 0)
     }
 }

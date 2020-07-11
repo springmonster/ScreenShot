@@ -275,24 +275,33 @@ internal class ComputerServerFrame @Throws(IOException::class) constructor() : J
                     // 判断是否有屏幕旋转
                     getWidthAndHeight()
 
+                    println("server x is $mDisplayX")
+                    println("server x is $mDisplayY")
+
                     // 获取图片的大小
-                    val length = dataInputStream.readInt()
+                    val size = dataInputStream.readInt()
+
+                    println("server data size is $size")
 
                     // 获取图片的字节数组并展示
                     if (bytes == null) {
-                        bytes = ByteArray(length)
+                        bytes = ByteArray(size)
                     }
-                    if (bytes.size < length) {
-                        bytes = ByteArray(length)
+                    if (bytes.size < size) {
+                        bytes = ByteArray(size)
                     }
                     var read = 0
-                    while (read < length) {
-                        read += bufferedInputStream.read(bytes, read, length - read)
+                    while (read < size) {
+                        read += bufferedInputStream.read(bytes, read, size - read)
                     }
 
                     val byteArrayInputStream = ByteArrayInputStream(bytes)
                     val image = ImageIO.read(byteArrayInputStream)
-                    mImageLabel.icon = ScaleIcon(ImageIcon(image))
+                    val scaleIcon = ScaleIcon(ImageIcon(image))
+                    mImageLabel.icon = scaleIcon
+
+                    println("server image width is ${scaleIcon.iconWidth}")
+                    println("server image height is ${scaleIcon.iconHeight}")
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -366,6 +375,9 @@ internal class ComputerServerFrame @Throws(IOException::class) constructor() : J
                 val y = mouseEvent.y
                 val calcX = calcXInDisplay(x)
                 val calcY = calcYInDisplay(y)
+
+                println("server calc x is $calcX")
+                println("server calc y is $calcY")
 
                 writer.write("DOWN$calcX#$calcY")
                 writer.newLine()

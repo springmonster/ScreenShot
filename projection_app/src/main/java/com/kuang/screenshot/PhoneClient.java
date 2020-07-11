@@ -26,15 +26,7 @@ public class PhoneClient {
     private static final String HOME = "HOME";
     private static final String BACK = "BACK";
 
-    private static final String KEY_UP = "KEY_UP";
-    private static final String KEY_DOWN = "KEY_DOWN";
-    private static final String KEY_LEFT = "KEY_LEFT";
-    private static final String KEY_RIGHT = "KEY_RIGHT";
-    private static final String KEY_ENTER = "KEY_ENTER";
-    private static final String KEY_ESC = "KEY_ESC";
-
     private static float scale = 0.5f;
-    private static LocalServerSocket mLocalServerSocket;
 
     public static void main(String[] args) throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         System.out.println(">>>>>> phone client start");
@@ -48,7 +40,7 @@ public class PhoneClient {
 
         System.out.println(">>>>>> phone client init");
 
-        mLocalServerSocket = new LocalServerSocket("wisescreenshot");
+        LocalServerSocket mLocalServerSocket = new LocalServerSocket("wisescreenshot");
         HandleInputEvent.init();
 
         while (true) {
@@ -147,6 +139,8 @@ public class PhoneClient {
             String[] s = input.split("#");
             point.x = Integer.parseInt(s[0]);
             point.y = Integer.parseInt(s[1]);
+            System.out.println("phone client click x is " + point.x);
+            System.out.println("phone client click y is " + point.y);
             return point;
         } catch (Exception e) {
             e.printStackTrace();
