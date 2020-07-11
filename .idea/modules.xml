@@ -3,8 +3,11 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ScreenShot.iml" filepath="$PROJECT_DIR$/ScreenShot.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/wiseclientlibrary/wiseclientlibrary.iml" filepath="$PROJECT_DIR$/wiseclientlibrary/wiseclientlibrary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ScreenShot-ScreenShot.iml" filepath="$PROJECT_DIR$/.idea/modules/ScreenShot-ScreenShot.iml" group="ScreenShot" />
+      <module fileurl="file://$PROJECT_DIR$/projection_app/app.iml" filepath="$PROJECT_DIR$/projection_app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/projection_app/projection_app.iml" filepath="$PROJECT_DIR$/.idea/modules/projection_app/projection_app.iml" group="ScreenShot/projection_app" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/projection_server/projection_server.iml" filepath="$PROJECT_DIR$/.idea/modules/projection_server/projection_server.iml" group="ScreenShot/projection_server" />
+      <module fileurl="file://$PROJECT_DIR$/projection_server/wiseclientlibrary.iml" filepath="$PROJECT_DIR$/projection_server/wiseclientlibrary.iml" />
     </modules>
   </component>
 </project>

@@ -1,1 +1,1 @@
-include ':app', ':wiseclientlibrary'
+include ':projection_app', ':projection_server'

@@ -14,7 +14,7 @@ import javax.swing.*
 /**
  * Created by kuanghaochuan on 2017/7/13.
  */
-internal class ComputerClientFrame @Throws(IOException::class) constructor() : JFrame() {
+internal class ComputerServer @Throws(IOException::class) constructor() : JFrame() {
     private val mScreenSize = Toolkit.getDefaultToolkit().screenSize
     private val mFrameHeight = (mScreenSize.getHeight() * 9 / 10).toInt()
     private val mFrameWidth = (mScreenSize.getHeight() * 9 / 10).toInt()
@@ -197,9 +197,9 @@ internal class ComputerClientFrame @Throws(IOException::class) constructor() : J
 
         println("current path is $path")
 
-        val menuImageIcon = ImageIcon(ImageIO.read(File("$path/wiseclientlibrary/images/menu.png")))
-        val homeImageIcon = ImageIcon(ImageIO.read(File("$path/wiseclientlibrary/images/home.png")))
-        val backImageIcon = ImageIcon(ImageIO.read(File("$path/wiseclientlibrary/images/back.png")))
+        val menuImageIcon = ImageIcon(ImageIO.read(File("$path/projection_server/images/menu.png")))
+        val homeImageIcon = ImageIcon(ImageIO.read(File("$path/projection_server/images/home.png")))
+        val backImageIcon = ImageIcon(ImageIO.read(File("$path/projection_server/images/back.png")))
 
         mJLabelBottomMenu = JLabel(menuImageIcon)
         mJLabelBottomMenu.background = Color.BLACK
@@ -464,7 +464,7 @@ internal class ComputerClientFrame @Throws(IOException::class) constructor() : J
         @Throws(IOException::class)
         @JvmStatic
         fun main(args: Array<String>) {
-            ComputerClientFrame().isVisible = true
+            ComputerServer().isVisible = true
         }
     }
 }
