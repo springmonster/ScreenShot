@@ -37,45 +37,32 @@ public class PhoneClient {
     private static int rotation = 0;
     private static LocalServerSocket mLocalServerSocket;
 
-    public static void main(String[] args) {
-        startUnixSocket();
-    }
+    public static void main(String[] args) throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        System.out.println(">>>>>> phone client start");
 
-    private static void startUnixSocket() {
-        System.out.println("start unix socket");
-        try {
-            startLocalServerSocket();
-        } catch (Exception e) {
-            System.out.println("start unix socket error");
-            System.out.println(e.getMessage());
-        }
-    }
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                e.printStackTrace(System.out);
+            }
+        });
 
-    private static void startLocalServerSocket() throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        System.out.println("start local server socket");
+        System.out.println(">>>>>> phone client init");
+
         mLocalServerSocket = new LocalServerSocket("wisescreenshot");
         HandleInputEvent.init();
 
         while (true) {
-            System.out.println("local server socket listening...");
+            System.out.println(">>>>>> phone client listen");
             try {
                 LocalSocket localSocket = mLocalServerSocket.accept();
-                handleLocalSocket(localSocket);
+                System.out.println(">>>>>> phone client accepted");
+                readSocket(localSocket);
+                writeSocket(localSocket);
             } catch (Exception e) {
-                System.out.println("local server socket listening error");
                 System.out.println(e.getMessage());
-                try {
-                    mLocalServerSocket = new LocalServerSocket("wisescreenshot");
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
             }
         }
-    }
-
-    private static void handleLocalSocket(LocalSocket localSocket) {
-        readSocket(localSocket);
-        writeSocket(localSocket);
     }
 
     private static void writeSocket(final LocalSocket localSocket) {
