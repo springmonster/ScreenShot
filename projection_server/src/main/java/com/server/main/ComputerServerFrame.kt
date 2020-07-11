@@ -5,7 +5,10 @@ import com.server.script.UserActionInterface
 import com.server.script.saveFile
 import java.awt.Color
 import java.awt.Toolkit
-import java.awt.event.*
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 import java.io.*
 import java.net.Socket
 import javax.imageio.ImageIO
@@ -59,8 +62,6 @@ internal class ComputerServerFrame @Throws(IOException::class) constructor() : J
         this.add(mMainPanel)
 
         mUserActionInterface = UserAction(mJTextAreaShowScript)
-
-        mMainPanel.addKeyListener(LabelMouseKeyListener())
 
         mainPanelRequestFocus()
     }
@@ -352,6 +353,9 @@ internal class ComputerServerFrame @Throws(IOException::class) constructor() : J
         mMainPanel.repaint()
     }
 
+    /**
+     * 鼠标点击事件，对应手机端的点击
+     */
     internal inner class LabelMouseClickListener : MouseAdapter() {
         override fun mouseClicked(mouseEvent: MouseEvent) {
             mainPanelRequestFocus()
@@ -398,6 +402,9 @@ internal class ComputerServerFrame @Throws(IOException::class) constructor() : J
         }
     }
 
+    /**
+     * 鼠标移动，对应手机端的滑动
+     */
     internal inner class LabelMouseMotionListener : MouseAdapter() {
         override fun mouseDragged(mouseEvent: MouseEvent) {
             mainPanelRequestFocus()
@@ -428,47 +435,6 @@ internal class ComputerServerFrame @Throws(IOException::class) constructor() : J
     private fun mainPanelRequestFocus() {
         mMainPanel.isFocusable = true
         mMainPanel.requestFocus()
-    }
-
-    internal inner class LabelMouseKeyListener : KeyListener {
-        override fun keyTyped(e: KeyEvent) {}
-
-        override fun keyPressed(e: KeyEvent) {
-            try {
-                println("key pressed " + e.keyCode)
-                val code = e.keyCode
-
-                if (code == KeyEvent.VK_UP) {
-                    writer.write("KEY_UP")
-                    mUserActionInterface.actionKeyUpPress()
-                } else if (code == KeyEvent.VK_DOWN) {
-                    writer.write("KEY_DOWN")
-                    mUserActionInterface.actionKeyDownPress()
-                } else if (code == KeyEvent.VK_LEFT) {
-                    writer.write("KEY_LEFT")
-                    mUserActionInterface.actionKeyLeftPress()
-                } else if (code == KeyEvent.VK_RIGHT) {
-                    writer.write("KEY_RIGHT")
-                    mUserActionInterface.actionKeyRightPress()
-                } else if (code == KeyEvent.VK_ENTER) {
-                    writer.write("KEY_ENTER")
-                    mUserActionInterface.actionKeyEnterPress()
-                } else if (code == KeyEvent.VK_ESCAPE) {
-                    writer.write("KEY_ESC")
-                    mUserActionInterface.actionKeyBackPress()
-                }
-
-                writer.newLine()
-                writer.flush()
-            } catch (e1: IOException) {
-                e1.printStackTrace()
-            }
-
-        }
-
-        override fun keyReleased(e: KeyEvent) {
-            println("key pressed " + e.keyCode)
-        }
     }
 
     companion object {

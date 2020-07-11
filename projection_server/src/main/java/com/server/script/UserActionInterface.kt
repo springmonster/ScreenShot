@@ -14,16 +14,4 @@ internal interface UserActionInterface {
     fun actionMenuPress()
 
     fun actionHomePress()
-
-    fun actionKeyUpPress()
-
-    fun actionKeyDownPress()
-
-    fun actionKeyLeftPress()
-
-    fun actionKeyRightPress()
-
-    fun actionKeyEnterPress()
-
-    fun actionKeyBackPress()
 }

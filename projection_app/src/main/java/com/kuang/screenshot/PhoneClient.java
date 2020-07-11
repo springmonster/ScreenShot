@@ -103,18 +103,8 @@ public class PhoneClient {
             HandleInputEvent.pressMenu();
         } else if (line.startsWith(HOME)) {
             HandleInputEvent.pressHome();
-        } else if (line.startsWith(BACK) || line.startsWith(KEY_ESC)) {
+        } else if (line.startsWith(BACK)) {
             HandleInputEvent.pressBack();
-        } else if (line.startsWith(KEY_UP)) {
-            HandleInputEvent.pressUp();
-        } else if (line.startsWith(KEY_DOWN)) {
-            HandleInputEvent.pressDown();
-        } else if (line.startsWith(KEY_LEFT)) {
-            HandleInputEvent.pressLeft();
-        } else if (line.startsWith(KEY_RIGHT)) {
-            HandleInputEvent.pressRight();
-        } else if (line.startsWith(KEY_ENTER)) {
-            HandleInputEvent.pressEnter();
         }
     }
 

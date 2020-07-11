@@ -26,26 +26,6 @@ class HandleInputEvent {
         injectInputEventMethod = InputManager.class.getMethod("injectInputEvent", InputEvent.class, Integer.TYPE);
     }
 
-    static void pressLeft() throws InvocationTargetException, IllegalAccessException {
-        sendKeyEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_KEYBOARD, KeyEvent.KEYCODE_DPAD_LEFT, false);
-    }
-
-    static void pressRight() throws InvocationTargetException, IllegalAccessException {
-        sendKeyEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_KEYBOARD, KeyEvent.KEYCODE_DPAD_RIGHT, false);
-    }
-
-    static void pressUp() throws InvocationTargetException, IllegalAccessException {
-        sendKeyEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_KEYBOARD, KeyEvent.KEYCODE_DPAD_UP, false);
-    }
-
-    static void pressDown() throws InvocationTargetException, IllegalAccessException {
-        sendKeyEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_KEYBOARD, KeyEvent.KEYCODE_DPAD_DOWN, false);
-    }
-
-    static void pressEnter() throws InvocationTargetException, IllegalAccessException {
-        sendKeyEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_KEYBOARD, KeyEvent.KEYCODE_ENTER, false);
-    }
-
     static void pressMenu() throws InvocationTargetException, IllegalAccessException {
         sendKeyEvent(im, injectInputEventMethod, InputDeviceCompat.SOURCE_KEYBOARD, KeyEvent.KEYCODE_MENU, false);
     }
