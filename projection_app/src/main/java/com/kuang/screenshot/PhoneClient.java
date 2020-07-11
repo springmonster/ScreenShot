@@ -34,7 +34,6 @@ public class PhoneClient {
     private static final String KEY_ESC = "KEY_ESC";
 
     private static float scale = 0.5f;
-    private static int rotation = 0;
     private static LocalServerSocket mLocalServerSocket;
 
     public static void main(String[] args) throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
@@ -57,49 +56,20 @@ public class PhoneClient {
             try {
                 LocalSocket localSocket = mLocalServerSocket.accept();
                 System.out.println(">>>>>> phone client accepted");
-                readSocket(localSocket);
-                writeSocket(localSocket);
+                read(localSocket);
+                write(localSocket);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
         }
     }
 
-    private static void writeSocket(final LocalSocket localSocket) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(localSocket.getOutputStream());
-                    DataOutputStream dataOutputStream = new DataOutputStream(bufferedOutputStream);
-                    while (true) {
-                        int x = ScreenUtils.getDisplaySize().x;
-                        int y = ScreenUtils.getDisplaySize().y;
-
-                        dataOutputStream.writeInt(x);
-                        dataOutputStream.writeInt(y);
-
-                        Bitmap bitmap = ScreenUtils.screenshot();
-                        if (bitmap == null) {
-                            return;
-                        }
-                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 60, byteArrayOutputStream);
-
-                        dataOutputStream.writeInt(byteArrayOutputStream.size());
-
-                        bufferedOutputStream.write(byteArrayOutputStream.toByteArray());
-                        bufferedOutputStream.flush();
-                    }
-                } catch (Exception e) {
-                    System.out.println("write socket " + e.getMessage());
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-    }
-
-    private static void readSocket(final LocalSocket localSocket) {
+    /**
+     * 从电脑端读取数据，进行手机的操作
+     *
+     * @param localSocket
+     */
+    private static void read(final LocalSocket localSocket) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -192,5 +162,50 @@ public class PhoneClient {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * 将手机的屏幕传输给电脑端
+     * <p>
+     * 数据传输如下：
+     * 手机宽 手机高 图像大小 图像字节数组
+     * x     y      size    byte array
+     *
+     * @param localSocket
+     */
+    private static void write(final LocalSocket localSocket) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(localSocket.getOutputStream());
+                    DataOutputStream dataOutputStream = new DataOutputStream(bufferedOutputStream);
+                    while (true) {
+                        // 获取手机图像并压缩
+                        Bitmap bitmap = ScreenUtils.screenshot();
+                        bitmap = Bitmap.createScaledBitmap(bitmap, (int) (ScreenUtils.getDisplaySize().x * scale),
+                                (int) (ScreenUtils.getDisplaySize().y * scale), true);
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 60, byteArrayOutputStream);
+
+                        int x = ScreenUtils.getDisplaySize().x;
+                        int y = ScreenUtils.getDisplaySize().y;
+
+                        // 输出手机屏幕的宽和高
+                        dataOutputStream.writeInt(x);
+                        dataOutputStream.writeInt(y);
+
+                        // 输出手机图像大小
+                        dataOutputStream.writeInt(byteArrayOutputStream.size());
+
+                        // 输出图像
+                        bufferedOutputStream.write(byteArrayOutputStream.toByteArray());
+                        bufferedOutputStream.flush();
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).start();
     }
 }
