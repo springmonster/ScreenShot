@@ -1,6 +1,6 @@
-# Android:手机与电脑共享屏幕
+# Android:手机投屏
 
-## 几种截屏方式
+## Android几种截屏方式
 
 * View.getDrawingCache()
 * 读取/dev/graphics/fb0
@@ -10,26 +10,28 @@
 
 最后两种方式也是Vysor这款软件所采用的。
 
+
 ## Android Annotation @hide
 
 * 对于@hide标记的class，在/system/framework/framework.jar中是存在的。但是在开发中引入Android Sdk的时候，引用的为sdk/platforms/android-X/android.jar（例如X为21），这里面被标记为@hide的class已经不存在了。例如SurfaceControl.java。
 * 对于@hide标记的field和method，可通过反射进行调用。
 
-## Adb
-## app_process
-### am命令
+
+## Adb命令
+### app_process
+#### am命令
 
 ```
 adb shell am start -n com.android.browser/com.android.browser.BrowserActivity
 ```
 
-### pm命令
+#### pm命令
 
 ```
 adb shell pm list packages
 ```
 
-### 如何启动自定义的Java类获取类似am命令的效果
+#### 如何启动自定义的Java类获取类似am命令的效果
 
 ```
 package com.wise.main;
@@ -50,10 +52,34 @@ export CLASSPATH=/sdcard/HelloWorld.dex
 exec app_process /system/bin com.wise.main.HelloWorld
 ```
 
-## LocalSocketServer
+### LocalSocketServer
+
+### adb forward 协议:port 协议:port
 
 ## 如何运行
 * 运行ComputerClientFrame.java
 * 点击Phone -> Prepare
 * 点击Phone -> Connect Phone
 * 如果使用鼠标进行点击操作，打开开发者选项里面的“模拟点击”
+
+## 数据格式
+### 手机端到电脑端
+> 发送
+```
+手机屏幕的宽：DataOutputStream
+手机屏幕的高：DataOutputStream
+手机图像大小：DataOutputStream
+手机图像字节数组：BufferedOutputStream
+```
+
+> 接收
+```
+字符串：BufferedReader
+UP302#492：操作类型x#y
+UP
+DOWN
+MOVE
+MENU
+HOME
+BACK
+```
