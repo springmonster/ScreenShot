@@ -1,4 +1,4 @@
-package com.client.script
+package com.server.script
 
 /**
  * Created by kuanghaochuan on 2017/7/17.

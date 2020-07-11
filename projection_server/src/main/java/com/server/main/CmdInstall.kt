@@ -1,4 +1,4 @@
-package com.client.main
+package com.server.main
 
 import java.io.*
 
@@ -72,6 +72,10 @@ private fun checkPlatform() {
     }
 }
 
+/**
+ * 将电脑的3000端口进行转发
+ * 与手机端的localabstract：wisescreenshot进行通信
+ */
 private fun execAdbForwardCommand() {
     println("-----> adb shell forward command start <------")
     try {
@@ -97,8 +101,10 @@ private fun execAdbForwardCommand() {
 
 }
 
+/**
+ * 将生成的apk推送到手机端并进行Main方法的启动
+ */
 private fun execAppProcessCommand() {
-    //        String findApkCmd = "export CLASSPATH=/data/app/com.wise.wisescreenshot-1/base.apk";
     val findApkCmd = "export CLASSPATH=/sdcard/PhoneClient.apk"
     val startApkCmd = "exec app_process /sdcard com.kuang.screenshot.PhoneClient"
 
@@ -182,7 +188,6 @@ fun execExitAppProcessCommand() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
     }
 }
 
@@ -227,5 +232,4 @@ private fun findAppProcessPid(): String? {
         e.printStackTrace()
         return pid
     }
-
 }

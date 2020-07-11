@@ -1,8 +1,8 @@
-package com.client.main
+package com.server.main
 
-import com.client.script.UserAction
-import com.client.script.UserActionInterface
-import com.client.script.saveFile
+import com.server.script.UserAction
+import com.server.script.UserActionInterface
+import com.server.script.saveFile
 import java.awt.Color
 import java.awt.Toolkit
 import java.awt.event.*
@@ -14,7 +14,7 @@ import javax.swing.*
 /**
  * Created by kuanghaochuan on 2017/7/13.
  */
-internal class ComputerServer @Throws(IOException::class) constructor() : JFrame() {
+internal class ComputerServerFrame @Throws(IOException::class) constructor() : JFrame() {
     private val mScreenSize = Toolkit.getDefaultToolkit().screenSize
     private val mFrameHeight = (mScreenSize.getHeight() * 9 / 10).toInt()
     private val mFrameWidth = (mScreenSize.getHeight() * 9 / 10).toInt()
@@ -46,23 +46,22 @@ internal class ComputerServer @Throws(IOException::class) constructor() : JFrame
     private var isGVertical = true
 
     init {
-        createComputerClientFrame()
+        initComputerServerFrame()
 
-        createMainPanel()
+        initMainPanel()
 
-        createImageLabel()
+        initImageLabel()
 
-        createBottomBar()
+        initBottomBar()
 
-        createScriptPanel()
-
-//        setScriptViewsVisible(false)
+        initScriptPanel()
 
         this.add(mMainPanel)
 
         mUserActionInterface = UserAction(mJTextAreaShowScript)
 
         mMainPanel.addKeyListener(LabelMouseKeyListener())
+
         mainPanelRequestFocus()
     }
 
@@ -84,23 +83,12 @@ internal class ComputerServer @Throws(IOException::class) constructor() : JFrame
         mMainPanel.updateUI()
     }
 
-    private fun createComputerClientFrame() {
-        createJMenu()
-
-        this.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-        this.setBounds(450, 0, mFrameWidth, mFrameHeight)
-        this.title = "Screen Share"
-        this.isResizable = false
-        this.addWindowListener(object : WindowAdapter() {
-            override fun windowClosing(e: WindowEvent) {
-                println("window closing")
-                execExitAppProcessCommand()
-                super.windowClosing(e)
-            }
-        })
+    private fun initComputerServerFrame() {
+        initJMenu()
+        initDefaultSettings()
     }
 
-    private fun createJMenu() {
+    private fun initJMenu() {
         mJMenuBar = JMenuBar()
 
         val phoneJMenu = JMenu("Phone")
@@ -126,7 +114,7 @@ internal class ComputerServer @Throws(IOException::class) constructor() : JFrame
                 installDex()
             }.start()
         }
-        connectJMenuItem.addActionListener { startSocket("127.0.0.1", "3000") }
+        connectJMenuItem.addActionListener { startConnecting() }
 
         disJMenuItem.addActionListener {
             if (disJMenuItem.text == "Show script") {
@@ -150,7 +138,25 @@ internal class ComputerServer @Throws(IOException::class) constructor() : JFrame
         }
     }
 
-    private fun createScriptPanel() {
+    private fun startConnecting() {
+        startSocket("127.0.0.1", "3000")
+    }
+
+    private fun initDefaultSettings() {
+        this.defaultCloseOperation = EXIT_ON_CLOSE
+        this.setBounds(450, 0, mFrameWidth, mFrameHeight)
+        this.title = "Screen Share"
+        this.isResizable = false
+        this.addWindowListener(object : WindowAdapter() {
+            override fun windowClosing(e: WindowEvent) {
+                println("window closing")
+                execExitAppProcessCommand()
+                super.windowClosing(e)
+            }
+        })
+    }
+
+    private fun initScriptPanel() {
         mJTextAreaShowScript = JTextArea()
         mJTextAreaShowScript.setBounds(mFrameWidth / 2, 0, mFrameWidth / 2, mFrameHeight)
         mJTextAreaShowScript.lineWrap = true
@@ -163,14 +169,14 @@ internal class ComputerServer @Throws(IOException::class) constructor() : JFrame
         mMainPanel.add(mJScrollPane)
     }
 
-    private fun createMainPanel() {
+    private fun initMainPanel() {
         mMainPanel = JPanel()
         mMainPanel.setBounds(0, 0, mFrameWidth, mFrameHeight)
         mMainPanel.layout = null
         mMainPanel.background = Color(220, 240, 250)
     }
 
-    private fun createImageLabel() {
+    private fun initImageLabel() {
         mImageLabel = JLabel()
         mImageLabel.background = Color.BLACK
         mImageLabel.isOpaque = true
@@ -191,7 +197,7 @@ internal class ComputerServer @Throws(IOException::class) constructor() : JFrame
     }
 
     @Throws(IOException::class)
-    private fun createBottomBar() {
+    private fun initBottomBar() {
         val file = File("")
         val path = file.absolutePath
 
@@ -230,7 +236,6 @@ internal class ComputerServer @Throws(IOException::class) constructor() : JFrame
             override fun mouseClicked(mouseEvent: MouseEvent) {
                 super.mouseClicked(mouseEvent)
                 writeMouseAction("HOME")
-
             }
         })
         mJLabelBottomBack.addMouseListener(object : MouseAdapter() {
@@ -253,55 +258,62 @@ internal class ComputerServer @Throws(IOException::class) constructor() : JFrame
     }
 
     private fun startSocket(ip: String, port: String) {
-        object : Thread() {
-            override fun run() {
-                super.run()
-                try {
-                    val socket = Socket(ip, Integer.parseInt(port))
-                    val inputStream = BufferedInputStream(socket.getInputStream())
-                    val dataInputStream = DataInputStream(inputStream)
-                    writer = BufferedWriter(OutputStreamWriter(socket.getOutputStream()))
-                    var bytes: ByteArray? = null
-                    while (true) {
-                        mDisplayX = dataInputStream.readInt()
-                        mDisplayY = dataInputStream.readInt()
-                        if (mDisplayOldX != mDisplayX && mDisplayOldY != mDisplayY) {
-                            if (mDisplayOldX == 0 && mDisplayOldY == 0) {
-                                if (mDisplayX > mDisplayY) {
-                                    changeDisplayOrientation(false)
-                                }
-                            }
-                            if (mDisplayOldX < mDisplayOldY && mDisplayX > mDisplayY) {
-                                changeDisplayOrientation(false)
-                            } else if (mDisplayOldX > mDisplayOldY && mDisplayX < mDisplayY) {
-                                changeDisplayOrientation(true)
-                            }
-                            mDisplayOldX = mDisplayX
-                            mDisplayOldY = mDisplayY
-                        }
+        Thread(Runnable {
+            try {
+                val socket = Socket(ip, Integer.parseInt(port))
+                val bufferedInputStream = BufferedInputStream(socket.getInputStream())
+                val dataInputStream = DataInputStream(bufferedInputStream)
+                writer = BufferedWriter(OutputStreamWriter(socket.getOutputStream()))
 
-                        val length = dataInputStream.readInt()
+                var bytes: ByteArray? = null
+                while (true) {
+                    // 获取手机的宽和高
+                    mDisplayX = dataInputStream.readInt()
+                    mDisplayY = dataInputStream.readInt()
 
-                        if (bytes == null) {
-                            bytes = ByteArray(length)
-                        }
-                        if (bytes.size < length) {
-                            bytes = ByteArray(length)
-                        }
-                        var read = 0
-                        while (read < length) {
-                            read += inputStream.read(bytes, read, length - read)
-                        }
-                        val byteArrayInputStream = ByteArrayInputStream(bytes)
-                        val image = ImageIO.read(byteArrayInputStream)
-                        mImageLabel.icon = ScaleIcon(ImageIcon(image))
+                    // 判断是否有屏幕旋转
+                    getWidthAndHeight()
+
+                    // 获取图片的大小
+                    val length = dataInputStream.readInt()
+
+                    // 获取图片的字节数组并展示
+                    if (bytes == null) {
+                        bytes = ByteArray(length)
                     }
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
+                    if (bytes.size < length) {
+                        bytes = ByteArray(length)
+                    }
+                    var read = 0
+                    while (read < length) {
+                        read += bufferedInputStream.read(bytes, read, length - read)
+                    }
 
+                    val byteArrayInputStream = ByteArrayInputStream(bytes)
+                    val image = ImageIO.read(byteArrayInputStream)
+                    mImageLabel.icon = ScaleIcon(ImageIcon(image))
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
             }
-        }.start()
+        }).start()
+    }
+
+    private fun getWidthAndHeight() {
+        if (mDisplayOldX != mDisplayX && mDisplayOldY != mDisplayY) {
+            if (mDisplayOldX == 0 && mDisplayOldY == 0) {
+                if (mDisplayX > mDisplayY) {
+                    changeDisplayOrientation(false)
+                }
+            }
+            if (mDisplayOldX < mDisplayOldY && mDisplayX > mDisplayY) {
+                changeDisplayOrientation(false)
+            } else if (mDisplayOldX > mDisplayOldY && mDisplayX < mDisplayY) {
+                changeDisplayOrientation(true)
+            }
+            mDisplayOldX = mDisplayX
+            mDisplayOldY = mDisplayY
+        }
     }
 
     private fun changeDisplayOrientation(isVertical: Boolean) {
@@ -464,7 +476,7 @@ internal class ComputerServer @Throws(IOException::class) constructor() : JFrame
         @Throws(IOException::class)
         @JvmStatic
         fun main(args: Array<String>) {
-            ComputerServer().isVisible = true
+            ComputerServerFrame().isVisible = true
         }
     }
 }

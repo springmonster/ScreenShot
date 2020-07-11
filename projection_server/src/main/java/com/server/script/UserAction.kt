@@ -1,4 +1,4 @@
-package com.client.script
+package com.server.script
 
 import javax.swing.JTextArea
 
@@ -21,7 +21,7 @@ internal class UserAction(private val mJTextArea: JTextArea) : UserActionInterfa
             append("\n")
         }
 
-        println("actionViewClick x is $x y is $y")
+        println("UserAction actionViewClick x is $x y is $y")
 
         mDisplayScript.handleScript(result)
     }
@@ -32,7 +32,7 @@ internal class UserAction(private val mJTextArea: JTextArea) : UserActionInterfa
             append("\n")
         }
 
-        println("actionViewMove")
+        println("UserAction actionViewMove")
 
         mDisplayScript.handleScript(result)
     }
@@ -45,7 +45,7 @@ internal class UserAction(private val mJTextArea: JTextArea) : UserActionInterfa
             append("\n")
         }
 
-        println("actionBackPress")
+        println("UserAction actionBackPress")
 
         mDisplayScript.handleScript(result)
     }
@@ -55,7 +55,7 @@ internal class UserAction(private val mJTextArea: JTextArea) : UserActionInterfa
             append("PRESS|{'name':'MENU','type':'downAndUp',}")
             append("\n")
         }
-        println("actionMenuPress")
+        println("UserAction actionMenuPress")
 
         mDisplayScript.handleScript(result)
     }
@@ -66,7 +66,7 @@ internal class UserAction(private val mJTextArea: JTextArea) : UserActionInterfa
             append("\n")
         }
 
-        println("actionHomePress")
+        println("UserAction actionHomePress")
 
         mDisplayScript.handleScript(result)
     }
@@ -79,7 +79,7 @@ internal class UserAction(private val mJTextArea: JTextArea) : UserActionInterfa
             append("\n")
         }
 
-        println("actionKeyUpPress")
+        println("UserAction actionKeyUpPress")
 
         mDisplayScript.handleScript(result)
     }
@@ -92,7 +92,7 @@ internal class UserAction(private val mJTextArea: JTextArea) : UserActionInterfa
             append("\n")
         }
 
-        println("actionKeyDownPress")
+        println("UserAction actionKeyDownPress")
 
         mDisplayScript.handleScript(result)
     }
@@ -105,7 +105,7 @@ internal class UserAction(private val mJTextArea: JTextArea) : UserActionInterfa
             append("\n")
         }
 
-        println("actionKeyLeftPress")
+        println("UserAction actionKeyLeftPress")
 
         mDisplayScript.handleScript(result)
     }
@@ -118,7 +118,7 @@ internal class UserAction(private val mJTextArea: JTextArea) : UserActionInterfa
             append("\n")
         }
 
-        println("actionKeyRightPress")
+        println("UserAction actionKeyRightPress")
 
         mDisplayScript.handleScript(result)
     }
@@ -131,7 +131,7 @@ internal class UserAction(private val mJTextArea: JTextArea) : UserActionInterfa
             append("\n")
         }
 
-        println("actionKeyEnterPress")
+        println("UserAction actionKeyEnterPress")
 
         mDisplayScript.handleScript(result)
 
@@ -145,7 +145,7 @@ internal class UserAction(private val mJTextArea: JTextArea) : UserActionInterfa
             append("\n")
         }
 
-        println("actionKeyBackPress")
+        println("UserAction actionKeyBackPress")
 
         mDisplayScript.handleScript(result)
     }

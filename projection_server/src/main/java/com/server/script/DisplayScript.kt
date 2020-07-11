@@ -1,4 +1,4 @@
-package com.client.script
+package com.server.script
 
 import javax.swing.JTextArea
 

@@ -1,4 +1,4 @@
-package com.client.main
+package com.server.main
 
 import java.awt.Component
 import java.awt.Graphics
@@ -9,8 +9,9 @@ import javax.swing.Icon
 
 /**
  * Created by kuanghaochuan on 2017/7/13.
+ *
+ * 生成展示图片
  */
-
 class ScaleIcon internal constructor(private val icon: Icon) : Icon {
 
     override fun getIconHeight(): Int {
