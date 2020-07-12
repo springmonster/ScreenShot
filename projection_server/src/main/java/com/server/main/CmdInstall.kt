@@ -25,7 +25,7 @@ private fun getFilePath() = File("").absolutePath
 fun installDex() {
     checkPlatform()
     execAdbPushCommand()
-    execAdbForwardCommand()
+//    execAdbForwardCommand()
     execAppProcessCommand()
 }
 
@@ -77,7 +77,7 @@ private fun checkPlatform() {
  * 与手机端的localabstract：wisescreenshot进行通信
  */
 private fun execAdbForwardCommand() {
-    println("-----> adb shell forward command start <------")
+    println("-----> adb shell forward tcp:53516 tcp:53516 start <------")
     try {
         val process: Process = if (isUnix) {
             Runtime.getRuntime().exec("sh")
@@ -87,14 +87,14 @@ private fun execAdbForwardCommand() {
 
         val outputStream = BufferedWriter(OutputStreamWriter(process.outputStream))
 
-        outputStream.write("$ADB_PATH forward tcp:3000 localabstract:wisescreenshot")
+        outputStream.write("$ADB_PATH forward tcp:53516 tcp:53516")
         outputStream.write("\n")
         outputStream.write("exit\n")
         outputStream.flush()
 
         process.waitFor()
         readExecCommandResult(process.inputStream)
-        println("-----> adb shell forward command end <------")
+        println("-----> adb shell forward tcp:53516 tcp:53516 command end <------")
     } catch (e: Exception) {
         e.printStackTrace()
     }
@@ -106,7 +106,7 @@ private fun execAdbForwardCommand() {
  */
 private fun execAppProcessCommand() {
     val findApkCmd = "export CLASSPATH=/sdcard/PhoneClient.apk"
-    val startApkCmd = "exec app_process /sdcard com.kuang.screenshot.PhoneClient"
+    val startApkCmd = "exec app_process /sdcard com.kuang.screenshot.PhoneClientOkHttp"
 
     val commands: Array<String>
 
