@@ -11,4 +11,8 @@ class DisplayScript internal constructor(private val mJTextArea: JTextArea) : Sc
     override fun handleScript(value: String) {
         this.mJTextArea.append(value)
     }
+
+    override fun clearScript() {
+        this.mJTextArea.text = ""
+    }
 }

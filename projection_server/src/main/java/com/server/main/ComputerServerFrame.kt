@@ -96,7 +96,6 @@ internal class ComputerServerFrame @Throws(IOException::class) constructor() : J
         val connectJMenuItem = JMenuItem("Connect phone")
 
         val scriptJMenu = JMenu("Script")
-        val disJMenuItem = JMenuItem("Show script")
         val saveJMenuItem = JMenuItem("Save script")
         val replayJMenuItem = JMenuItem("Replay script")
 
@@ -107,7 +106,6 @@ internal class ComputerServerFrame @Throws(IOException::class) constructor() : J
         phoneJMenu.add(prepareJMenuItem)
         phoneJMenu.add(connectJMenuItem)
 
-        scriptJMenu.add(disJMenuItem)
         scriptJMenu.add(saveJMenuItem)
         scriptJMenu.add(replayJMenuItem)
 
@@ -117,16 +115,6 @@ internal class ComputerServerFrame @Throws(IOException::class) constructor() : J
             }.start()
         }
         connectJMenuItem.addActionListener { startConnecting() }
-
-        disJMenuItem.addActionListener {
-            if (disJMenuItem.text == "Show script") {
-                disJMenuItem.text = "Hide script"
-                setScriptViewsVisible(true)
-            } else if (disJMenuItem.text == "Hide script") {
-                disJMenuItem.text = "Show script"
-                setScriptViewsVisible(false)
-            }
-        }
 
         saveJMenuItem.addActionListener {
             val fileChooser = JFileChooser()

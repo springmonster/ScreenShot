@@ -6,4 +6,6 @@ package com.server.script
 
 interface ScriptInterface {
     fun handleScript(value: String)
+
+    fun clearScript()
 }
