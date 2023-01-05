@@ -1,5 +1,7 @@
 # Android:手机投屏
 
+> Some APIS have been removed since Android 12
+
 ## Android几种截屏方式
 
 * View.getDrawingCache()
